@@ -14,6 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using ProjetoLojaVirtual.Database;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using ProjetoLojaVirtual.Repositories;
+using ProjetoLojaVirtual.Libraries.Sessao;
+using ProjetoLojaVirtual.Libraries.Login;
 
 namespace ProjetoLojaVirtual
 {
@@ -32,7 +34,8 @@ namespace ProjetoLojaVirtual
             /*
              * Padrão repository
              */
-                      
+
+            services.AddHttpContextAccessor();
             services.AddScoped<IClienteRepository, ClienteRepository>();
             services.AddScoped<INewsletterRepository, NewsletterRepository>();
 
@@ -43,6 +46,15 @@ namespace ProjetoLojaVirtual
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            /*
+             * Session configuration
+             */
+            services.AddMemoryCache(); //Guardar os dados na memória
+            services.AddSession(Options=> {
+            });
+
+            services.AddScoped<Sessao>();
+            services.AddScoped<LoginCliente>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -68,6 +80,7 @@ namespace ProjetoLojaVirtual
             app.UseDefaultFiles();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseSession();
            
             app.UseMvc(routes =>
             {
