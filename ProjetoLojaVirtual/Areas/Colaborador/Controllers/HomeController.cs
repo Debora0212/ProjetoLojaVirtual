@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
@@ -44,9 +45,11 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             }
         }
 
-        public IActionResult Painel()
+        [ColaboradorAutorizacao]
+        public IActionResult Logout()
         {
-            return View();
+            _loginColaborador.Logout();
+            return RedirectToAction("Login", "Home");
         }
 
         public IActionResult RecuperarSenha()
@@ -55,6 +58,12 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         }
 
         public IActionResult CadastrarNovaSenha()
+        {
+            return View();
+        }
+
+        [ColaboradorAutorizacao]
+        public IActionResult Painel()
         {
             return View();
         }
