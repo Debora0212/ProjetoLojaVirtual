@@ -51,11 +51,13 @@ namespace ProjetoLojaVirtual
              * Session configuration
              */
             services.AddMemoryCache(); //Guardar os dados na memória
-            services.AddSession(Options=> {
+            services.AddSession(Options =>
+            {
             });
 
             services.AddScoped<Sessao>();
             services.AddScoped<LoginCliente>();
+            services.AddScoped<LoginColaborador>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -82,9 +84,13 @@ namespace ProjetoLojaVirtual
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
-           
+
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "areas",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}"
+             );
                 routes.MapRoute(
                     name: "default",
                     template: "/{controller=Home}/{action=Index}/{id?}");
