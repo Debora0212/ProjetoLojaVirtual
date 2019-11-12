@@ -5,7 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
-{
+{   
+    [Area("Colaborador")]
     public class HomeController : Controller
     {
         public IActionResult Login()
