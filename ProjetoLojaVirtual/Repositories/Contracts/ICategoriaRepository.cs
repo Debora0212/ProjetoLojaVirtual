@@ -14,6 +14,7 @@ namespace ProjetoLojaVirtual.Repositories.Contracts
         void Atualizar(Categoria categoria);
         void Excluir(int Id);
         Categoria ObterCategoria(int Id);
+        IEnumerable<Categoria> ObterTodasCategorias();
         IPagedList<Categoria> ObterTodasCategorias(int? pagina);
 
     }
