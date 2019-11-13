@@ -42,7 +42,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         }
 
         [HttpGet]
-        public IActionResult Atualizar()
+        public IActionResult Atualizar(int Id)
         {
             return View();
         }
