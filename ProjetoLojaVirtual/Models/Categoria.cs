@@ -16,7 +16,7 @@ namespace ProjetoLojaVirtual.Models
          * Nome: Telefone sem fio
          * Slug: telefone-sem-fio
          */
-        public int Slug { get; set; }
+        public string Slug { get; set; }
 
 
         /*

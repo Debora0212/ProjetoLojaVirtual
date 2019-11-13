@@ -27,9 +27,9 @@ namespace ProjetoLojaVirtual.Migrations
 
                     b.Property<int?>("CategoriaPaiId");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Nome");
 
-                    b.Property<int>("Slug");
+                    b.Property<string>("Slug");
 
                     b.HasKey("Id");
 

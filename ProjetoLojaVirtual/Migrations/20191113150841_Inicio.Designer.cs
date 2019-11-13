@@ -10,7 +10,7 @@ using ProjetoLojaVirtual.Database;
 namespace ProjetoLojaVirtual.Migrations
 {
     [DbContext(typeof(LojaVirtualContext))]
-    [Migration("20191112214056_Inicio")]
+    [Migration("20191113150841_Inicio")]
     partial class Inicio
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,9 +29,9 @@ namespace ProjetoLojaVirtual.Migrations
 
                     b.Property<int?>("CategoriaPaiId");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Nome");
 
-                    b.Property<int>("Slug");
+                    b.Property<string>("Slug");
 
                     b.HasKey("Id");
 
