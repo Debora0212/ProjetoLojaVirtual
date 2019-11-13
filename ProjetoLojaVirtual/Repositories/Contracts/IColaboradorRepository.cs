@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace ProjetoLojaVirtual.Repositories.Contracts
 {
-        public interface IColaboradorRepository
+    public interface IColaboradorRepository
     {
         Colaborador Login(string Email, string Senha);
 
@@ -16,5 +17,7 @@ namespace ProjetoLojaVirtual.Repositories.Contracts
 
         Colaborador ObterColaborador(int Id);
         IEnumerable<Colaborador> ObterTodosColaboradores();
+        IPagedList<Colaborador> ObterTodosColaboradores(int? pagina);
+
     }
 }

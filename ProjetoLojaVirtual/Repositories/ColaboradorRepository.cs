@@ -1,20 +1,24 @@
-﻿using ProjetoLojaVirtual.Database;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using ProjetoLojaVirtual.Database;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using X.PagedList;
 
 namespace ProjetoLojaVirtual.Repositories
 {
     public class ColaboradorRepository : IColaboradorRepository
     {
+        private IConfiguration _conf;
         private LojaVirtualContext _banco;
-
-        public ColaboradorRepository(LojaVirtualContext banco)
+        public ColaboradorRepository(LojaVirtualContext banco, IConfiguration configuration)
         {
             _banco = banco;
+            _conf = configuration;
         }
 
         public void Cadastrar(Colaborador colaborador)
@@ -50,6 +54,14 @@ namespace ProjetoLojaVirtual.Repositories
         public IEnumerable<Colaborador> ObterTodosColaboradores()
         {
             return _banco.Colaboradores.ToList();
+        }
+
+        public IPagedList<Colaborador> ObterTodosColaboradores(int? pagina)
+        {
+            int RegistroPorPagina = _conf.GetValue<int>("RegistroPorPagina");
+
+            int NumeroPagina = pagina ?? 1;
+            return _banco.Colaboradores.ToPagedList<Colaborador>(NumeroPagina, RegistroPorPagina);
         }
     }
 }

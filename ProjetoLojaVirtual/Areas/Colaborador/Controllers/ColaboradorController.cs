@@ -3,12 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
     public class ColaboradorController : Controller
     {
-        public IActionResult Index()
+        private IColaboradorRepository _colaboradorRepository;
+        public ColaboradorController(IColaboradorRepository colaboradorRepository)
+        {
+            _colaboradorRepository = colaboradorRepository;
+        }
+
+        public IActionResult Index(int? pagina)
         {
             return View();
         }
