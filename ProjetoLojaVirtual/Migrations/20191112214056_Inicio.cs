@@ -14,7 +14,7 @@ namespace ProjetoLojaVirtual.Migrations
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(nullable: true),
+                    Nome = table.Column<string>(nullable: true),
                     Slug = table.Column<int>(nullable: false),
                     CategoriaPaiId = table.Column<int>(nullable: true)
                 },

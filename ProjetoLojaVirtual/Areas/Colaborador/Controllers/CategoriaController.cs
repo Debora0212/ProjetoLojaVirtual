@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Repositories.Contracts;
+using X.PagedList;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
@@ -21,9 +22,9 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             _categoriaRepository = categoriaRepository;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(int? pagina)
         {
-           List<Categoria> categorias = _categoriaRepository.ObterTodasCategorias().ToList();
+            var categorias = _categoriaRepository.ObterTodasCategorias(pagina);
             return View(categorias);
         }
 
