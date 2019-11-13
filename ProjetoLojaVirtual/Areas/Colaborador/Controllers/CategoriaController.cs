@@ -12,8 +12,7 @@ using X.PagedList;
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
     [Area("Colaborador")]
-    //TODO-Habilitar verificacao de login
-    //[ColaboradorAutorizacao]
+    [ColaboradorAutorizacao]
     public class CategoriaController : Controller
     {
         private ICategoriaRepository _categoriaRepository;

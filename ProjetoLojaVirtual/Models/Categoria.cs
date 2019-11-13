@@ -10,8 +10,11 @@ namespace ProjetoLojaVirtual.Models
 {
     public class Categoria
     {
+        [Display(Name = "Código")]
         public int Id { get; set; }
+
         //TODO-Criar validacao -Nome categoria unico no banco de dados
+        
         [Required(ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E001")]
         [MinLength(4, ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E002")]
         public string Nome { get; set; }
@@ -32,6 +35,7 @@ namespace ProjetoLojaVirtual.Models
          * -- 3-Mouse sem fio - P=2
          * -- 4-Mouse gamer - P=2
          */
+        [Display(Name = "Categoria Pai")]
         public int? CategoriaPaiId { get; set; }
 
          /*
