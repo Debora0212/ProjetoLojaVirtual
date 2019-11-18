@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Libraries.Lang;
+using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using X.PagedList;
 
@@ -36,6 +37,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         {
             if (ModelState.IsValid)
             {
+                //TODO-Gerar senha aleatoria,  Enviar o e-mail.
+
                 colaborador.Tipo = "C";
                 _colaboradorRepository.Cadastrar(colaborador);
 
@@ -45,23 +48,44 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             }
             return View();
         }
+        [HttpGet]
+        public IActionResult GerarSenha(int id)
+        {
+           Models.Colaborador colaborador = _colaboradorRepository.ObterColaborador(id);
+            colaborador.Senha = KeyGenerator.GetUniqueKey(8);
+            _colaboradorRepository.Atualizar(colaborador);
+            //TODOEnviar o e-mail.
+        }
 
         [HttpGet]
         public IActionResult Atualizar(int id)
         {
-            return View();
+           Models.Colaborador colaborador = _colaboradorRepository.ObterColaborador(id);
+            return View(colaborador);
         }
 
         [HttpPost]
         public IActionResult Atualizar([FromForm]Models.Colaborador colaborador, int id)
         {
+            if (ModelState.IsValid)
+            {
+                _colaboradorRepository.Atualizar(colaborador);
+
+                TempData["MSG_S"] = Mensagem.MSG_S001;
+
+                return RedirectToAction(nameof(Index));
+            }
             return View();
         }
 
         [HttpGet]
         public IActionResult Excluir(int id)
         {
-            return View();
+            _colaboradorRepository.Excluir(id);
+
+            TempData["MSG_S"] = Mensagem.MSG_S002;
+
+            return RedirectToAction(nameof(Index));
         }
 
     }
