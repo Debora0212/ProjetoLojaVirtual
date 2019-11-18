@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProjetoLojaVirtual.Libraries.Email;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Repositories.Contracts;
@@ -14,9 +15,12 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
     public class ColaboradorController : Controller
     {
         private IColaboradorRepository _colaboradorRepository;
-        public ColaboradorController(IColaboradorRepository colaboradorRepository)
+        private GerenciarEmail _gerenciarEmail;
+
+        public ColaboradorController(IColaboradorRepository colaboradorRepository, GerenciarEmail gerenciarEmail)
         {
             _colaboradorRepository = colaboradorRepository;
+            _gerenciarEmail = gerenciarEmail;
         }
 
         public IActionResult Index(int? pagina)
@@ -35,12 +39,14 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         [HttpPost]
         public IActionResult Cadastrar([FromForm]Models.Colaborador colaborador)
         {
+            ModelState.Remove("Senha");
             if (ModelState.IsValid)
             {
-                //TODO-Gerar senha aleatoria,  Enviar o e-mail.
-
                 colaborador.Tipo = "C";
+                colaborador.Senha = KeyGenerator.GetUniqueKey(8);
                 _colaboradorRepository.Cadastrar(colaborador);
+
+                _gerenciarEmail.EnviarSenhaParaColaboradorPorEmail(colaborador);
 
                 TempData["MSG_S"] = Mensagem.MSG_S001;
 
@@ -48,13 +54,20 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             }
             return View();
         }
+
         [HttpGet]
         public IActionResult GerarSenha(int id)
         {
            Models.Colaborador colaborador = _colaboradorRepository.ObterColaborador(id);
             colaborador.Senha = KeyGenerator.GetUniqueKey(8);
-            _colaboradorRepository.Atualizar(colaborador);
-            //TODOEnviar o e-mail.
+            _colaboradorRepository.AtualizarSenha(colaborador);
+
+            _gerenciarEmail.EnviarSenhaParaColaboradorPorEmail(colaborador);
+
+            TempData["MSG_S"] = Mensagem.MSG_S003;
+
+            return RedirectToAction(nameof(Index));
+
         }
 
         [HttpGet]
@@ -67,6 +80,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         [HttpPost]
         public IActionResult Atualizar([FromForm]Models.Colaborador colaborador, int id)
         {
+            ModelState.Remove("Senha");
             if (ModelState.IsValid)
             {
                 _colaboradorRepository.Atualizar(colaborador);
