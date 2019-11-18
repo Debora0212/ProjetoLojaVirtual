@@ -27,13 +27,14 @@ namespace ProjetoLojaVirtual.Models
         public string Senha { get; set; }
 
         [NotMapped]
+        [Display(Name ="Confirme a senha")]
+        [Compare("Senha", ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E005")]
         public string ConfirmacaoSenha { get; set; }
         /*
          * TIPO
          * - C=Comum
          * - G=Gerente
          */
-        [Required(ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E001")]
         public string Tipo { get; set; }
     }
 }

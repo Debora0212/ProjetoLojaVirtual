@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Repositories.Contracts;
+using X.PagedList;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
+    [Area("Colaborador")]
     public class ColaboradorController : Controller
     {
         private IColaboradorRepository _colaboradorRepository;
@@ -17,7 +20,9 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
         public IActionResult Index(int? pagina)
         {
-            return View();
+            IPagedList<Models.Colaborador> colaboradores = _colaboradorRepository.ObterTodosColaboradores(pagina);
+
+            return View(colaboradores);
         }
 
         [HttpGet]
@@ -29,6 +34,15 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         [HttpPost]
         public IActionResult Cadastrar([FromForm]Models.Colaborador colaborador)
         {
+            if (ModelState.IsValid)
+            {
+                colaborador.Tipo = "C";
+                _colaboradorRepository.Cadastrar(colaborador);
+
+                TempData["MSG_S"] = Mensagem.MSG_S001;
+
+                return RedirectToAction(nameof(Index));
+            }
             return View();
         }
 
