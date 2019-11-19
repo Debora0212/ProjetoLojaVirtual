@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Libraries.Email;
+using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Repositories.Contracts;
@@ -12,6 +13,7 @@ using X.PagedList;
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
     [Area("Colaborador")]
+    [ColaboradorAutorizacao("G")]
     public class ColaboradorController : Controller
     {
         private IColaboradorRepository _colaboradorRepository;

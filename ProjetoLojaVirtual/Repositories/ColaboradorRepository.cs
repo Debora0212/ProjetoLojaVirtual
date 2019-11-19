@@ -70,6 +70,9 @@ namespace ProjetoLojaVirtual.Repositories
             return _banco.Colaboradores.Where(a=> a.Tipo !="G").ToPagedList<Colaborador>(NumeroPagina, RegistroPorPagina);
         }
 
-        
+        public List<Colaborador> ObterColaboradorPorEmail(string email)
+        {
+            return _banco.Colaboradores.Where(a => a.Email == email).ToList();
+        }
     }
 }
