@@ -33,9 +33,7 @@ namespace ProjetoLojaVirtual.Models
         [Compare("Senha", ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E005")]
         public string ConfirmacaoSenha { get; set; }
         /*
-         * TIPO
-         * - C=Comum
-         * - G=Gerente
+         * TIPO - ColaboradorTipoConstant
          */
         public string Tipo { get; set; }
     }

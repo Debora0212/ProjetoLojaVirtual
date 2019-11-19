@@ -7,13 +7,14 @@ using ProjetoLojaVirtual.Libraries.Email;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Libraries.Texto;
+using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using X.PagedList;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
     [Area("Colaborador")]
-    [ColaboradorAutorizacao("G")]
+    [ColaboradorAutorizacao(ColaboradorTipoConstant.Gerente)]
     public class ColaboradorController : Controller
     {
         private IColaboradorRepository _colaboradorRepository;
@@ -44,7 +45,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             ModelState.Remove("Senha");
             if (ModelState.IsValid)
             {
-                colaborador.Tipo = "C";
+                colaborador.Tipo = ColaboradorTipoConstant.Comum;
                 colaborador.Senha = KeyGenerator.GetUniqueKey(8);
                 _colaboradorRepository.Cadastrar(colaborador);
 
@@ -58,6 +59,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         }
 
         [HttpGet]
+        [ValidateHttpReferer]
         public IActionResult GerarSenha(int id)
         {
            Models.Colaborador colaborador = _colaboradorRepository.ObterColaborador(id);
@@ -95,6 +97,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         }
 
         [HttpGet]
+        [ValidateHttpReferer]
         public IActionResult Excluir(int id)
         {
             _colaboradorRepository.Excluir(id);

@@ -19,6 +19,7 @@ using ProjetoLojaVirtual.Libraries.Login;
 using System.Net.Mail;
 using System.Net;
 using ProjetoLojaVirtual.Libraries.Email;
+using ProjetoLojaVirtual.Libraries.Middleware;
 
 namespace ProjetoLojaVirtual
 {
@@ -106,6 +107,7 @@ namespace ProjetoLojaVirtual
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSession();
+            app.UseMiddleware<ValidateAntiForgeryTokenMiddleware>();
 
             app.UseMvc(routes =>
             {

@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using ProjetoLojaVirtual.Database;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -67,7 +68,7 @@ namespace ProjetoLojaVirtual.Repositories
             int RegistroPorPagina = _conf.GetValue<int>("RegistroPorPagina");
 
             int NumeroPagina = pagina ?? 1;
-            return _banco.Colaboradores.Where(a=> a.Tipo !="G").ToPagedList<Colaborador>(NumeroPagina, RegistroPorPagina);
+            return _banco.Colaboradores.Where(a=> a.Tipo != ColaboradorTipoConstant.Gerente).ToPagedList<Colaborador>(NumeroPagina, RegistroPorPagina);
         }
 
         public List<Colaborador> ObterColaboradorPorEmail(string email)
