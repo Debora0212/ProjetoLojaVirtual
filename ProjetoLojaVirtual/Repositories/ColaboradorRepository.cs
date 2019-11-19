@@ -72,7 +72,7 @@ namespace ProjetoLojaVirtual.Repositories
 
         public List<Colaborador> ObterColaboradorPorEmail(string email)
         {
-            return _banco.Colaboradores.Where(a => a.Email == email).ToList();
+            return _banco.Colaboradores.Where(a => a.Email == email).AsNoTracking().ToList();
         }
     }
 }
