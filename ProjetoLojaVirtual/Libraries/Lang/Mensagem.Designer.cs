@@ -106,6 +106,15 @@ namespace ProjetoLojaVirtual.Libraries.Lang {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to O valor do campo {0} não se encontra entre {1} e {2}!.
+        /// </summary>
+        public static string MSG_E006 {
+            get {
+                return ResourceManager.GetString("MSG_E006", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Registro salvo com sucesso!.
         /// </summary>
         public static string MSG_S001 {
