@@ -10,7 +10,7 @@
     width: 100% !important;
     margin-bottom: 30px;
     border-top-left-radius: 0px;
-    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
 }
 
 .Imagens div {
@@ -19,6 +19,14 @@
 
 .Imagens .img-thumbnail {
     width: 100%;
+}
+
+.input-file {
+    display: none;
+}
+
+.img-upload {
+    cursor: pointer;
 }
 
 

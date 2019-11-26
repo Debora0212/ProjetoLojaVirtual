@@ -105,7 +105,8 @@
         @for (int i = 0; i < 12; i++)
         {
             <div class="col-md-2">
-                <img src="~/img/imagem-padrao.png" class="img-thumbnail" />
+                <input type="file" name="imagem[]" class="input-file" />
+                <img src="~/img/imagem-padrao.png" class="img-thumbnail img-upload" />
                 <div class="btn btn-danger btn-imagem-excluir">X</div>
             </div>
         }
@@ -113,4 +114,4 @@
 
 
     <button type="submit" class="btn btn-primary">Salvar</button> <a asp-action="Index" class="btn btn-info">Voltar</a>
-</form>                  
+</form>
