@@ -13,7 +13,7 @@
 
 function AjaxUploadImagemProduto() {
     $(".img-upload").click(function () {
-        $(this).parent().find(".input-file").click();
+        $(this).parent().parent().find(".input-file").click();
     });
     $(".btn-imagem-excluir").click(function () {
         var CampoHidden = $(this).parent().find("input[name=imagem]");
