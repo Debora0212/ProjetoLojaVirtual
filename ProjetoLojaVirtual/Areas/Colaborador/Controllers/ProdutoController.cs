@@ -16,11 +16,13 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
     {
         private IProdutoRepository _produtoRepository;
         private ICategoriaRepository _categoriaRepository;
+        private IImagemRepository _imagemRepository;
 
-        public ProdutoController(IProdutoRepository produtoRepository, ICategoriaRepository categoriaRepository)
+        public ProdutoController(IProdutoRepository produtoRepository, ICategoriaRepository categoriaRepository, IImagemRepository imagemRepository)
         {
             _produtoRepository = produtoRepository;
             _categoriaRepository = categoriaRepository;
+            _imagemRepository = imagemRepository;
         }
         public IActionResult Index(int? pagina, string pesquisa)
         {
@@ -41,20 +43,20 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             if (ModelState.IsValid)
             {
                 _produtoRepository.Cadastrar(produto);
-
-                
-                List<string> ListaCaminhoDef = GerenciadorArquivo.MoverImagemProduto(new List<string>(Request.Form["imagem"]), produto.Id.ToString());
-                //TODO- CaminhoTemp -> Mover a Imagempara o Caminho Definitivo
-
-                //TODO- Salvar o caminho Definitivo no banco de dados.
+                List<Imagem> ListaImagensDef = GerenciadorArquivo.MoverImagensProduto(new List<string>(Request.Form["imagem"]), produto.Id);
+                _imagemRepository.CadastrarImagens(ListaImagensDef, produto.Id);
 
                 TempData["MSG_S"] = Mensagem.MSG_S001;
 
                 return RedirectToAction(nameof(Index));
             }
+            else
+            {
+                ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Select(a => new SelectListItem(a.Nome, a.Id.ToString()));
+                produto.Imagens =new List<string>(Request.Form["imagem"]).Where(a=>a.Trim().Length > 0).Select(a => new Imagem() { Caminho = a }).ToList();
 
-            ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Select(a => new SelectListItem(a.Nome, a.Id.ToString()));
-            return View();
+                return View(produto);
+            }
         }
 
         [HttpGet]
@@ -76,11 +78,9 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
                 TempData["MSG_S"] = Mensagem.MSG_S001;
 
                 return RedirectToAction(nameof(Index));
-
             }
             ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Select(a => new SelectListItem(a.Nome, a.Id.ToString()));
             return View(produto);
-
         }
     }
 }
