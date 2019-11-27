@@ -20,7 +20,6 @@ namespace ProjetoLojaVirtual.Libraries.Arquivo
             {
                 file.CopyTo(stream);
             }
-
             return Path.Combine("/uploads/temp", NomeArquivo).Replace("\\", "/");
         }
 
@@ -56,27 +55,43 @@ namespace ProjetoLojaVirtual.Libraries.Arquivo
             List<Imagem> ListaImagensDef = new List<Imagem>();
             foreach (var CaminhoTemp in ListaCaminhoTemp)
             {
-                if ( !string.IsNullOrEmpty(CaminhoTemp) )
+                if (!string.IsNullOrEmpty(CaminhoTemp))
                 {
-                    // /uploads/temp/mouse-cosair.jpg
                     var NomeArquivo = Path.GetFileName(CaminhoTemp);
 
-                    var CaminhoAbsolutoTemp = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/temp", NomeArquivo);
-                    var CaminhoAbsolutoDef = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", ProdutoId.ToString(), NomeArquivo);
+                    var CaminhoDef = Path.Combine("/uploads", ProdutoId.ToString(), NomeArquivo).Replace("\\", "/");
 
-                    if (File.Exists(CaminhoAbsolutoTemp))
+                    if (CaminhoDef != CaminhoTemp)
                     {
-                        File.Copy(CaminhoAbsolutoTemp, CaminhoAbsolutoDef);
-                        if (File.Exists(CaminhoAbsolutoDef))
-                        {
-                            File.Delete(CaminhoAbsolutoTemp);
-                        }
+                        var CaminhoAbsolutoTemp = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/temp", NomeArquivo);
+                        var CaminhoAbsolutoDef = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads", ProdutoId.ToString(), NomeArquivo);
 
-                        ListaImagensDef.Add(new Imagem() { Caminho = Path.Combine("/uploads", ProdutoId.ToString(), NomeArquivo).Replace("\\", "/"), ProdutoId = ProdutoId });
+                        if (File.Exists(CaminhoAbsolutoTemp))
+                        {
+                            //Deleta arquivo no caminho de Destino.
+                            if (File.Exists(CaminhoAbsolutoDef))
+                            {
+                                File.Delete(CaminhoAbsolutoDef);
+                            }
+                            //Copia Arquivo da pasta Temporaria para Destino.
+                            File.Copy(CaminhoAbsolutoTemp, CaminhoAbsolutoDef);
+
+                            //Deleta arquivo da pasta Temporária.
+                            if (File.Exists(CaminhoAbsolutoDef))
+                            {
+                                File.Delete(CaminhoAbsolutoTemp);
+                            }
+
+                            ListaImagensDef.Add(new Imagem() { Caminho = Path.Combine("/uploads", ProdutoId.ToString(), NomeArquivo).Replace("\\", "/"), ProdutoId = ProdutoId });
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                     else
                     {
-                        return null;
+                        ListaImagensDef.Add(new Imagem() { Caminho = Path.Combine("/uploads", ProdutoId.ToString(), NomeArquivo).Replace("\\", "/"), ProdutoId = ProdutoId });
                     }
                 }
             }
