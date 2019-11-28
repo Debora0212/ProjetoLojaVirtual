@@ -92,5 +92,17 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
                 return View(produto);
             }
         }
+        [HttpGet]
+        public IActionResult Excluir(int id)
+        {
+            Produto produto = _produtoRepository.ObterProduto(id);
+            GerenciadorArquivo.ExcluirImagensProduto(produto.Imagens.ToList());
+            _imagemRepository.ExcluirImagemDoProduto(id);
+            _produtoRepository.Excluir(id);
+
+            TempData["MSG_S"] = Mensagem.MSG_S002;
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

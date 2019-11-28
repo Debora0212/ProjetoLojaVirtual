@@ -42,10 +42,14 @@ function AjaxUploadImagemProduto() {
         var Formulario = new FormData();
         Formulario.append("file", Binario);
 
-
         var CampoHidden = $(this).parent().find("input[name=imagem]");
         var Imagem = $(this).parent().find(".img-upload");
         var BtnExcluir = $(this).parent().find(".btn-imagem-excluir");
+
+        //Apresenta Imagem Loading.
+        Imagem.attr("src", "/img/loading.gif"); 
+        Imagem.addClass("thumb");
+
         //TODO - Requisição Ajax enviado a Formulario
         $.ajax({
             type: "POST",
@@ -55,10 +59,13 @@ function AjaxUploadImagemProduto() {
             processData: false,
             error: function () {
                 alert("Erro no envio do arquivo!");
+                Imagem.attr("src", "/img/imagem-padrao.png")
+                Imagem.removeClass("thumb");
             },
             success: function (data) {
                 var caminho = data.caminho;
                 Imagem.attr("src", caminho);
+                Imagem.removeClass("thumb");
                 CampoHidden.val(caminho);
                 BtnExcluir.removeClass("btn-ocultar");
             }
