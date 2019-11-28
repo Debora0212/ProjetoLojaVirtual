@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using ProjetoLojaVirtual.Libraries.Arquivo;
+using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Repositories.Contracts;
@@ -12,6 +13,7 @@ using ProjetoLojaVirtual.Repositories.Contracts;
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 {
     [Area("Colaborador")]
+    [ColaboradorAutorizacao]
     public class ProdutoController : Controller
     {
         private IProdutoRepository _produtoRepository;
@@ -92,7 +94,9 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
                 return View(produto);
             }
         }
+
         [HttpGet]
+        [ValidateHttpReferer]
         public IActionResult Excluir(int id)
         {
             Produto produto = _produtoRepository.ObterProduto(id);
