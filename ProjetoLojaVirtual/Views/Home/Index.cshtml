@@ -1,6 +1,7 @@
-﻿@model ProjetoLojaVirtual.Models.NewsletterEmail
+﻿@model ProjetoLojaVirtual.Models.ViewModels.IndexViewModel
 @{
     ViewData["Title"] = "Index";
+    var pesquisa = Context.Request.Query["pesquisa"];
 }
 
 <main role="main">
@@ -72,92 +73,47 @@
             ================================================== -->
     <!-- Wrap the rest of the page in another container to center all the content. -->
 
+    @if (Model.lista.Count > 0)
+    {
+        <div class="container" id="code_prod_complex">
+            <div class="row">
+                <div class="offset-md-10 col-md-2">
+                    <!-- Alfabetica, Menor Preço, Maior Preço -->
+                    <select id="ordenacao" asp-items="Model.ordenacao"></select>
+                </div>
+            </div>
+            <div class="row">
+                @foreach (var produto in Model.lista)
+                {
+                    <div class="col-md-3">
+                        <figure class="card card-product">
+                            <div class="img-wrap">
+                                @if (produto.Imagens != null && produto.Imagens.Count() > 0)
+                                {
+                                    <img src="@produto.Imagens.ElementAt(0).Caminho" />
+                                }
+                                else
+                                {
+                                    <img src="~/img/imagem-produto.png" />
+                                }
 
-    <div class="container" id="code_prod_complex">
-        <div class="row">
-            <div class="col-md-4">
-                <figure class="card card-product">
-                    <div class="img-wrap"><img src="images/items/1.jpg"></div>
-                    <figcaption class="info-wrap">
-                        <h4 class="title">Another name of item</h4>
-                        <p class="desc">Some small description goes here</p>
-                        <div class="rating-wrap">
-                            <ul class="rating-stars">
-                                <li style="width:80%" class="stars-active">
-                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                </li>
-                                <li>
-                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                </li>
-                            </ul>
-                            <div class="label-rating">132 reviews</div>
-                            <div class="label-rating">154 orders </div>
-                        </div> <!-- rating-wrap.// -->
-                    </figcaption>
-                    <div class="bottom-wrap">
-                        <a href="" class="btn btn-sm btn-primary float-right">Order Now</a>
-                        <div class="price-wrap h5">
-                            <span class="price-new">$1280</span> <del class="price-old">$1980</del>
-                        </div> <!-- price-wrap.// -->
-                    </div> <!-- bottom-wrap.// -->
-                </figure>
-            </div> <!-- col // -->
-            <div class="col-md-4">
-                <figure class="card card-product">
-                    <div class="img-wrap"><img src="images/items/2.jpg"> </div>
-                    <figcaption class="info-wrap">
-                        <h4 class="title">Good product</h4>
-                        <p class="desc">Some small description goes here</p>
-                        <div class="rating-wrap">
-                            <ul class="rating-stars">
-                                <li style="width:80%" class="stars-active">
-                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                </li>
-                                <li>
-                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                </li>
-                            </ul>
-                            <div class="label-rating">132 reviews</div>
-                            <div class="label-rating">154 orders </div>
-                        </div> <!-- rating-wrap.// -->
-                    </figcaption>
-                    <div class="bottom-wrap">
-                        <a href="" class="btn btn-sm btn-primary float-right">Order Now</a>
-                        <div class="price-wrap h5">
-                            <span class="price-new">$1280</span> <del class="price-old">$1980</del>
-                        </div> <!-- price-wrap.// -->
-                    </div> <!-- bottom-wrap.// -->
-                </figure>
-            </div> <!-- col // -->
-            <div class="col-md-4">
-                <figure class="card card-product">
-                    <div class="img-wrap"><img src="images/items/3.jpg"></div>
-                    <figcaption class="info-wrap">
-                        <h4 class="title">Product name goes here</h4>
-                        <p class="desc">Some small description goes here</p>
-                        <div class="rating-wrap">
-                            <ul class="rating-stars">
-                                <li style="width:80%" class="stars-active">
-                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                </li>
-                                <li>
-                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
-                                </li>
-                            </ul>
-                            <div class="label-rating">132 reviews</div>
-                            <div class="label-rating">154 orders </div>
-                        </div> <!-- rating-wrap.// -->
-                    </figcaption>
-                    <div class="bottom-wrap">
-                        <a href="" class="btn btn-sm btn-primary float-right">Order Now</a>
-                        <div class="price-wrap h5">
-                            <span class="price-new">$1280</span> <del class="price-old">$1980</del>
-                        </div> <!-- price-wrap.// -->
-                    </div> <!-- bottom-wrap.// -->
-                </figure>
-            </div> <!-- col // -->
-        </div> <!-- row.// -->
-    </div>
+                            </div>
+                            <figcaption class="info-wrap">
+                                <h4 class="title">@produto.Nome</h4>
+                            </figcaption>
+                            <div class="bottom-wrap">
+                                <a href="" class="btn btn-sm btn-primary float-right">Adicionar Carrinho</a>
+                                <div class="price-wrap h5">
+                                    <span class="price-new">@produto.Valor.ToString("C")</span>
+                                </div> <!-- price-wrap.// -->
+                            </div> <!-- bottom-wrap.// -->
+                        </figure>
+                    </div> <!-- col // -->
+                }
+            </div> <!-- row.// -->
+            @Html.PagedListPager((IPagedList)Model.lista, pagina => Url.Action("Index", new { pagina = pagina, pesquisa = pesquisa }))
+        </div>
+    }
 </main>
 
 @{
@@ -178,7 +134,7 @@
 
 
 
-@using (Html.BeginForm(null, null, null, FormMethod.Post, false, new { @action = @Url.Action("index", "home") + "#formulario" }))
+@using (Html.BeginForm(null, null, null, FormMethod.Post, true, new { @action = @Url.Action("index", "home") + "#formulario" }))
 {
 
     <div class="container" id="formulario">
@@ -199,9 +155,9 @@
                         <div class="input-group-prepend">
                             <span class="input-group-text"><i class="fa  fa-envelope "></i></span>
                         </div>
-                        @Html.EditorFor(m => m.Email, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.EditorFor(m => m.newsletter.Email, new { htmlAttributes = new { @class = "form-control" } })
                     </div>
-                    <span style="color: red;">@Html.ValidationMessageFor(m => m.Email)</span>
+                    <span style="color: red;">@Html.ValidationMessageFor(m => m.newsletter.Email)</span>
                 </div>
             </div>
             <div class="col-sm-2">
@@ -213,4 +169,4 @@
         </div>
     </div>
 
-}
+}       
