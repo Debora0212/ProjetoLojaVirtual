@@ -46,13 +46,16 @@ namespace ProjetoLojaVirtual.Controllers
                 TempData["MSG_S"] = "E-mail cadastrado! Agora você vai receber promoções especiais no seu e-mail! Fique atento as novidades!";
                 
                 return RedirectToAction(nameof(Index));
-
             }
             else
             {
                 return View();
             }
+        }
 
+        public IActionResult Categoria()
+        {
+            return View();
         }
 
         public IActionResult Contato()
