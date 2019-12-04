@@ -23,12 +23,7 @@ namespace ProjetoLojaVirtual.Controllers
         [Route("/Produto/Categoria/{Slug}")]
         public IActionResult ListagemCategoria(string slug)
         {
-            Categoria CategoriaPrincipal = _categoriaRepository.ObterCategoria(slug);
-            List<Categoria> lista = _categoriaRepository.ObterCategoriasRecursivas(CategoriaPrincipal).ToList();
-            ViewBag.categorias = lista;
-
-
-            return View();
+            return View(_categoriaRepository.ObterCategoria(slug));
         }
 
        
