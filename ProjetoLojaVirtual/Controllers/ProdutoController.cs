@@ -9,6 +9,13 @@ namespace ProjetoLojaVirtual.Controllers
 {
     public class ProdutoController : Controller
     {
+        [HttpGet]
+        [Route("/Produto/Categoria/{Slug}")]
+        public IActionResult ListagemCategoria(string slug)
+        {
+            return View();
+        }
+
         public ActionResult Visualizar()
         {
             Produto produto = GetProduto();

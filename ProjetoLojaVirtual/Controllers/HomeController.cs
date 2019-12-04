@@ -34,14 +34,13 @@ namespace ProjetoLojaVirtual.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index(int? pagina, string pesquisa, string ordenacao)
+        public IActionResult Index()
         {
-            var viewModel = new IndexViewModel() { lista = _produtoRepository.ObterTodosProdutos(pagina, pesquisa, ordenacao) };
-            return View(viewModel);
+            return View();
         }
 
         [HttpPost]
-        public IActionResult Index(int? pagina, string pesquisa, string ordenacao, [FromForm]NewsletterEmail newsletter)
+        public IActionResult Index([FromForm]NewsletterEmail newsletter)
         {
             if (ModelState.IsValid)
             {
@@ -53,8 +52,7 @@ namespace ProjetoLojaVirtual.Controllers
             }
             else
             {
-                var viewModel = new IndexViewModel() { lista = _produtoRepository.ObterTodosProdutos(pagina, pesquisa, ordenacao) };
-                return View(viewModel);
+                return View();
             }
         }
 
