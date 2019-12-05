@@ -1,7 +1,15 @@
 ﻿$(document).ready(function () {
     MoverScrollOrdenacao();
     MudarOrdenacao();
+    MudarImagePrincipalProduto();
 });
+function MudarImagePrincipalProduto() {
+    $(".img-small-wrap img").click(function () {
+        var Caminho = $(this).attr("src");
+        $(".img-big-wrap img").attr("src", Caminho);
+        $(".img-big-wrap a").attr("href", Caminho);
+    });
+}
 function MoverScrollOrdenacao() {
     if (window.location.hash.length > 0) {
         var hash = window.location.hash;
