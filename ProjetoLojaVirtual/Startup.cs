@@ -20,6 +20,7 @@ using System.Net.Mail;
 using System.Net;
 using ProjetoLojaVirtual.Libraries.Email;
 using ProjetoLojaVirtual.Libraries.Middleware;
+using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 
 namespace ProjetoLojaVirtual
 {
@@ -63,6 +64,9 @@ namespace ProjetoLojaVirtual
                 return smtp;
             });
             services.AddScoped<GerenciarEmail>();
+            services.AddScoped<CarrinhoCompra>();
+            services.AddScoped<ProjetoLojaVirtual.Libraries.Cookie.Cookie>();
+
 
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -81,6 +85,7 @@ namespace ProjetoLojaVirtual
             });
 
             services.AddScoped<Sessao>();
+            services.AddScoped<ProjetoLojaVirtual.Libraries.Cookie.Cookie>();
             services.AddScoped<LoginCliente>();
             services.AddScoped<LoginColaborador>();
 
