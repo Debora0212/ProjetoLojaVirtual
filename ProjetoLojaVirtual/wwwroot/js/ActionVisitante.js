@@ -2,7 +2,23 @@
     MoverScrollOrdenacao();
     MudarOrdenacao();
     MudarImagePrincipalProduto();
+    MudarQuantidadeProdutoCarrinho();
 });
+function MudarQuantidadeProdutoCarrinho() {
+    $("#order .btn-primary").click(function () {
+        var pai = $(this).parent().parent();
+        if ($(this).hasClass("diminuir")) {
+            LogicaMudarQuantidadeProdutoUnitarioCarrinho("diminuir", $(this));
+            //var id = pai.find(".inputProdutoId").val();
+        }
+        if ($(this).hasClass("aumentar")) {
+            LogicaMudarQuantidadeProdutoUnitarioCarrinho("diminuir", $(this));
+        }
+    });
+}
+function LogicaMudarQuantidadeProdutoUnitarioCarrinho(operacao, botao) {
+
+}
 function MudarImagePrincipalProduto() {
     $(".img-small-wrap img").click(function () {
         var Caminho = $(this).attr("src");

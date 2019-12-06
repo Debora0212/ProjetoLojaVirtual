@@ -15,7 +15,7 @@
                     <thead class="text-muted">
                         <tr>
                             <th scope="col">Produto</th>
-                            <th scope="col" width="120">Quantidade</th>
+                            <th scope="col" width="150">Quantidade</th>
                             <th scope="col" width="120">Preço</th>
                             <th scope="col" width="200" class="text-right">Ação</th>
                         </tr>
@@ -33,26 +33,31 @@
                                                 <dt>Size: </dt>
                                                 <dd>XXL</dd>
                                             </dl>
-                                            <dl class="dlist-inline small">
-                                                <dt>Quantidade: </dt>
-                                                <dd>@item.QuantidadeProdutoCarrinho</dd>
-                                            </dl>
                                         </figcaption>
                                     </figure>
                                 </td>
                                 <td>
-                                    <select class="form-control">
-                                        <option>1</option>
-                                        <option>2</option>
-                                        <option>3</option>
-                                        <option>4</option>
-                                    </select>
+                                    <div class="col-auto">
+                                        <div class="input-group mb-2">
+                                            <input type="hidden" class="inputProdutoId" value="@item.Id" />
+                                            <input type="hidden" class="inputQuantidadeEstoque" value="@item.Quantidade" />
+                                            <input type="hidden" class="inputValorUnitario" value="@item.Valor" />
+                                            <div class="input-group-prepend">
+                                                <a href="#" class="btn btn-primary diminuir"> - </a>
+                                            </div>
+                                            <input type="text" style="width: 30px; text-align: center" readonly="readonly" class="form-control" value="@item.QuantidadeProdutoCarrinho" />
+                                            <div class="input-group-prepend">
+                                                <a href="#" class="btn btn-primary aumentar"> + </a>
+                                            </div>
+
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>
                                     <div class="price-wrap">
                                         <var class="price">@((item.Valor * item.QuantidadeProdutoCarrinho).ToString("C"))</var>
                                         <small class="text-muted">(@item.Valor.ToString("C") cada)</small>
-                                    </div> 
+                                    </div>
                                 </td>
                                 <td class="text-right">
                                     <a asp-controller="CarrinhoCompra" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger"> × Remove</a>
@@ -61,8 +66,8 @@
                         }
                     </tbody>
                 </table>
-            </div> 
-        </div> 
+            </div>
+        </div>
     </section>
 
 
@@ -89,7 +94,7 @@
                             <dd>PAC - R$ 66,30</dd>
                         </dl>
                     </div> <!-- box.// -->
-                </div> <!-- code-wrap.// -->
+                                        </div> <!-- code-wrap.// -->
             </aside>
             <aside class="col-md-4">
                 <h4 class="subtitle-doc">
