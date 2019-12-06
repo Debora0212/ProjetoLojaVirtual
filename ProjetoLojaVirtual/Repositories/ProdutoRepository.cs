@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using ProjetoLojaVirtual.Database;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using System;
 using System.Collections.Generic;

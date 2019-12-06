@@ -8,6 +8,7 @@ using ProjetoLojaVirtual.Libraries.Arquivo;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers

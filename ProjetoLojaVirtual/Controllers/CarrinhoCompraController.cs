@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Controllers
@@ -35,7 +36,7 @@ namespace ProjetoLojaVirtual.Controllers
             }
             else
             {
-                var item = new Item() { Id = id, Quantidade = 1 };
+                var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = 1 };
                 _carrinhoCompra.Cadastrar(item);
 
                 return RedirectToAction(nameof(Index));
@@ -45,14 +46,14 @@ namespace ProjetoLojaVirtual.Controllers
 
         public IActionResult AlterarQuantidade(int id, int quantidade)
         {
-            var item = new Item() { Id = id, Quantidade = quantidade };
+            var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = quantidade };
             _carrinhoCompra.Atualizar(item);
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult RemoverItem(int id)
         {
-            _carrinhoCompra.Remover(new Item() { Id = id });
+            _carrinhoCompra.Remover(new ProdutoItem() { Id = id });
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using System;
 using System.Collections.Generic;
 using System.Linq;
