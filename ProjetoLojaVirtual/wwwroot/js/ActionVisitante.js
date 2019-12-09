@@ -4,20 +4,60 @@
     MudarImagePrincipalProduto();
     MudarQuantidadeProdutoCarrinho();
 });
+
+function numberToReal(numero) {
+    var numero = numero.toFixed(2).split('.');
+    numero[0] = "R$ " + numero[0].split(/(?=(?:...)*$)/).join('.');
+    return numero.join(',');
+}
+
 function MudarQuantidadeProdutoCarrinho() {
     $("#order .btn-primary").click(function () {
-        var pai = $(this).parent().parent();
         if ($(this).hasClass("diminuir")) {
             LogicaMudarQuantidadeProdutoUnitarioCarrinho("diminuir", $(this));
-            //var id = pai.find(".inputProdutoId").val();
         }
         if ($(this).hasClass("aumentar")) {
-            LogicaMudarQuantidadeProdutoUnitarioCarrinho("diminuir", $(this));
+            LogicaMudarQuantidadeProdutoUnitarioCarrinho("aumentar", $(this));
         }
     });
 }
 function LogicaMudarQuantidadeProdutoUnitarioCarrinho(operacao, botao) {
+    //TODO - Implementar esta lógica.
+    var pai = botao.parent().parent();
 
+    var produtoId = pai.find(".inputProdutoId").val();
+    var quantidadeEstoque = parseInt(pai.find(".inputQuantidadeEstoque").val());
+    var valorUnitario = parseFloat(pai.find(".inputValorUnitario").val().replace(",", "."));
+
+    var campoQuantidadeProdutoCarrinho = pai.find(".inputQuantidadeProdutoCarrinho");
+    var quantidadeProdutoCarrinho = parseInt(campoQuantidadeProdutoCarrinho.val());
+
+    var campoValor = botao.parent().parent().parent().parent().parent().find(".price");
+
+    //TODO - Adicionar validações.
+    if (operacao == "aumentar") {
+        if (quantidadeProdutoCarrinho == quantidadeEstoque) {
+            alert("Opps! Não possuimos estoque suficiente para a quantidade que você deseja comprar!");
+        } else {
+            quantidadeProdutoCarrinho++;
+            campoQuantidadeProdutoCarrinho.val(quantidadeProdutoCarrinho);
+
+            var resultado = valorUnitario * quantidadeProdutoCarrinho;
+            campoValor.text(numberToReal(resultado));
+        }
+    } else if (operacao == "diminuir") {
+        if (quantidadeProdutoCarrinho == 1) {
+            alert("Opps! Caso não deseje este produto clique no botão Remover");
+        } else {
+            quantidadeProdutoCarrinho--;
+            campoQuantidadeProdutoCarrinho.val(quantidadeProdutoCarrinho);
+
+            var resultado = valorUnitario * quantidadeProdutoCarrinho;
+            campoValor.text(numberToReal(resultado));
+        }
+    }
+
+    //TODO - Atualizar o subtotal do produto
 }
 function MudarImagePrincipalProduto() {
     $(".img-small-wrap img").click(function () {
@@ -40,7 +80,7 @@ function MudarOrdenacao() {
         var Pagina = 1;
         var Pesquisa = "";
         var Ordenacao = $(this).val();
-        var Fragment0 = "#posicao-produto";
+        var Fragmento = "#posicao-produto";
 
         var QueryString = new URLSearchParams(window.location.search);
         if (QueryString.has("pagina")) {

@@ -21,6 +21,7 @@ namespace ProjetoLojaVirtual.Libraries.Cookie
         {
             CookieOptions Options = new CookieOptions();
             Options.Expires = DateTime.Now.AddDays(7);
+            Options.IsEssential = true;
 
             _context.HttpContext.Response.Cookies.Append(Key, Valor, Options);
         }
