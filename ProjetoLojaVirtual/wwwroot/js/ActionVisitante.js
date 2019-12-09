@@ -4,11 +4,13 @@
     MudarImagePrincipalProduto();
     MudarQuantidadeProdutoCarrinho();
 });
+
 function numberToReal(numero) {
     var numero = numero.toFixed(2).split('.');
     numero[0] = "R$ " + numero[0].split(/(?=(?:...)*$)/).join('.');
     return numero.join(',');
 }
+
 function MudarQuantidadeProdutoCarrinho() {
     $("#order .btn-primary").click(function () {
         if ($(this).hasClass("diminuir")) {
@@ -19,6 +21,7 @@ function MudarQuantidadeProdutoCarrinho() {
         }
     });
 }
+
 function OrquestradorDeAcoesProduto(operacao, botao) {
     OcultarMensagemDeErro();
     /*
@@ -36,6 +39,7 @@ function OrquestradorDeAcoesProduto(operacao, botao) {
     var campoValor = botao.parent().parent().parent().parent().parent().find(".price");
 
     var produto = new ProdutoQuantidadeEValor(produtoId, quantidadeEstoque, valorUnitario, quantidadeProdutoCarrinhoAntiga, 0, campoQuantidadeProdutoCarrinho, campoValor);
+
     /*
      * Chamada de Métodos
      */
@@ -47,18 +51,19 @@ function OrquestradorDeAcoesProduto(operacao, botao) {
 }
 function AlteracoesVisuaisProdutoCarrinho(produto, operacao) {
     if (operacao == "aumentar") {
-       /* if (produto.quantidadeProdutoCarrinhoAntiga == produto.quantidadeEstoque) {
-            alert("Ops! Não possuimos estoque suficiente para a quantidade que você deseja comprar!");
-        } else */{
+        /*if (produto.quantidadeProdutoCarrinhoAntiga == produto.quantidadeEstoque) {
+            alert("Opps! Não possuimos estoque suficiente para a quantidade que você deseja comprar!");
+        } else*/ {
             produto.quantidadeProdutoCarrinhoNova = produto.quantidadeProdutoCarrinhoAntiga + 1;
 
             AtualizarQuantidadeEValor(produto);
 
             AJAXComunicarAlteracaoQuantidadeProduto(produto);
+
         }
     } else if (operacao == "diminuir") {
         /*if (produto.quantidadeProdutoCarrinhoAntiga == 1) {
-            alert("Ops! Caso não deseje este produto clique no botão Remover");
+            alert("Opps! Caso não deseje este produto clique no botão Remover");
         } else */ {
             produto.quantidadeProdutoCarrinhoNova = produto.quantidadeProdutoCarrinhoAntiga - 1;
 
@@ -73,14 +78,14 @@ function AJAXComunicarAlteracaoQuantidadeProduto(produto) {
         type: "GET",
         url: "/CarrinhoCompra/AlterarQuantidade?id=" + produto.produtoId + "&quantidade=" + produto.quantidadeProdutoCarrinhoNova,
         error: function (data) {
-            MostrarMensagemDeErro(data.responseJSON.mensagem) 
+            MostrarMensagemDeErro(data.responseJSON.mensagem);
 
             //Rollback
             produto.quantidadeProdutoCarrinhoNova = produto.quantidadeProdutoCarrinhoAntiga;
-            AtualizarQuantidadeValor(produto);
+            AtualizarQuantidadeEValor(produto);
         },
         success: function () {
-            
+
         }
     });
 }
@@ -90,13 +95,29 @@ function MostrarMensagemDeErro(mensagem) {
 }
 function OcultarMensagemDeErro() {
     $(".alert-danger").css("display", "none");
-   
 }
+
 function AtualizarQuantidadeEValor(produto) {
     produto.campoQuantidadeProdutoCarrinho.val(produto.quantidadeProdutoCarrinhoNova);
 
     var resultado = produto.valorUnitario * produto.quantidadeProdutoCarrinhoNova;
     produto.campoValor.text(numberToReal(resultado));
+
+    AtualizarSubtotal();
+}
+function AtualizarSubtotal() {
+    var Subtotal = 0;
+
+    var TagsComPrice = $(".price");
+
+    TagsComPrice.each(function () {
+        var ValorReais = parseFloat($(this).text().replace("R$", "").replace(".", "").replace(" ", "").replace(",", "."));
+
+        Subtotal += ValorReais;
+    })
+    $(".subtotal").text(numberToReal(Subtotal));
+
+
 }
 function MudarImagePrincipalProduto() {
     $(".img-small-wrap img").click(function () {
@@ -139,7 +160,6 @@ function MudarOrdenacao() {
 
     });
 }
-
 /*
  * ------------------ Classes --------------------
  */
