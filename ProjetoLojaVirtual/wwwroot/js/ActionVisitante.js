@@ -20,6 +20,7 @@ function MudarQuantidadeProdutoCarrinho() {
     });
 }
 function OrquestradorDeAcoesProduto(operacao, botao) {
+    OcultarMensagemDeErro();
     /*
      * Carregamento dos valores
      */
@@ -46,9 +47,9 @@ function OrquestradorDeAcoesProduto(operacao, botao) {
 }
 function AlteracoesVisuaisProdutoCarrinho(produto, operacao) {
     if (operacao == "aumentar") {
-        if (produto.quantidadeProdutoCarrinhoAntiga == produto.quantidadeEstoque) {
+       /* if (produto.quantidadeProdutoCarrinhoAntiga == produto.quantidadeEstoque) {
             alert("Ops! Não possuimos estoque suficiente para a quantidade que você deseja comprar!");
-        } else {
+        } else */{
             produto.quantidadeProdutoCarrinhoNova = produto.quantidadeProdutoCarrinhoAntiga + 1;
 
             AtualizarQuantidadeEValor(produto);
@@ -56,9 +57,9 @@ function AlteracoesVisuaisProdutoCarrinho(produto, operacao) {
             AJAXComunicarAlteracaoQuantidadeProduto(produto);
         }
     } else if (operacao == "diminuir") {
-        if (produto.quantidadeProdutoCarrinhoAntiga == 1) {
+        /*if (produto.quantidadeProdutoCarrinhoAntiga == 1) {
             alert("Ops! Caso não deseje este produto clique no botão Remover");
-        } else {
+        } else */ {
             produto.quantidadeProdutoCarrinhoNova = produto.quantidadeProdutoCarrinhoAntiga - 1;
 
             AtualizarQuantidadeEValor(produto);
@@ -72,7 +73,7 @@ function AJAXComunicarAlteracaoQuantidadeProduto(produto) {
         type: "GET",
         url: "/CarrinhoCompra/AlterarQuantidade?id=" + produto.produtoId + "&quantidade=" + produto.quantidadeProdutoCarrinhoNova,
         error: function (data) {
-            alert("Ops!Tivemos um erro!");
+            MostrarMensagemDeErro(data.responseJSON.mensagem) 
 
             //Rollback
             produto.quantidadeProdutoCarrinhoNova = produto.quantidadeProdutoCarrinhoAntiga;
@@ -82,6 +83,14 @@ function AJAXComunicarAlteracaoQuantidadeProduto(produto) {
             
         }
     });
+}
+function MostrarMensagemDeErro(mensagem) {
+    $(".alert-danger").css("display", "block");
+    $(".alert-danger").text(mensagem);
+}
+function OcultarMensagemDeErro() {
+    $(".alert-danger").css("display", "none");
+   
 }
 function AtualizarQuantidadeEValor(produto) {
     produto.campoQuantidadeProdutoCarrinho.val(produto.quantidadeProdutoCarrinhoNova);

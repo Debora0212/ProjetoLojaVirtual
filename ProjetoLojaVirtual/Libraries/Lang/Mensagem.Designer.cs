@@ -115,6 +115,24 @@ namespace ProjetoLojaVirtual.Libraries.Lang {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Quantidade não pode ser 0, se desejar remova este item do carrinho!.
+        /// </summary>
+        public static string MSG_E007 {
+            get {
+                return ResourceManager.GetString("MSG_E007", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Quantidade de produto solicitada é maior do que o estoque desse produto!.
+        /// </summary>
+        public static string MSG_E008 {
+            get {
+                return ResourceManager.GetString("MSG_E008", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Registro salvo com sucesso!.
         /// </summary>
         public static string MSG_S001 {

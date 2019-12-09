@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
+using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
@@ -62,9 +63,22 @@ namespace ProjetoLojaVirtual.Controllers
         }
         public IActionResult AlterarQuantidade(int id, int quantidade)
         {
-            var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = quantidade };
-            _carrinhoCompra.Atualizar(item);
-            return RedirectToAction(nameof(Index));
+            Produto produto = _produtoRepository.ObterProduto(id);
+            if(quantidade < 1)
+            {
+                return BadRequest(new { mensagem = Mensagem.MSG_E007 });
+            }
+            else if (quantidade > produto.Quantidade)
+            {
+                return BadRequest(new { mensagem = Mensagem.MSG_E008 });
+            }
+            else
+            {
+                var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = quantidade };
+                _carrinhoCompra.Atualizar(item);
+                return Ok(new { mensagem = Mensagem.MSG_S001});
+            }
+           
         }
         public IActionResult RemoverItem(int id)
         {
