@@ -80,7 +80,9 @@ namespace ProjetoLojaVirtual
             services.AddScoped<GerenciarEmail>();
             services.AddScoped<ProjetoLojaVirtual.Libraries.Cookie.Cookie>();
             services.AddScoped<CarrinhoCompra>();
+            services.AddScoped<CalcularPacote>();
             services.AddScoped<WSCorreiosCalcularFrete>();
+            
 
 
             services.Configure<CookiePolicyOptions>(options =>

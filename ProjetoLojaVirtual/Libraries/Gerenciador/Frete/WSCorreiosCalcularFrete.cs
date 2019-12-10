@@ -19,24 +19,31 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Frete
             _servico = servico;
         }
 
-        public async Task<List<ValorPrazoFrete>> CalcularFrete(String cepDestino, String tipoFrete, List<Pacote> pacotes)
+        public async Task<ValorPrazoFrete> CalcularFrete(String cepDestino, String tipoFrete, List<Pacote> pacotes)
         {
             List<ValorPrazoFrete> ValorDosPacotesPorFrete = new List<ValorPrazoFrete>();
             foreach (var pacote in pacotes)
             {
-                ValorDosPacotesPorFrete.Add(await CalcularValorPrazoFrete(cepDestino, tipoFrete, pacote));
-            }
+                var resultado = await CalcularValorPrazoFrete(cepDestino, tipoFrete, pacote);
 
-            List<ValorPrazoFrete> ValorDosFretes = ValorDosPacotesPorFrete
+                if (resultado != null)
+                    ValorDosPacotesPorFrete.Add(resultado);
+            }
+            if(ValorDosPacotesPorFrete.Count > 0)
+            {
+                ValorPrazoFrete ValorDosFretes = ValorDosPacotesPorFrete
                 .GroupBy(a => a.TipoFrete)
                  .Select(list => new ValorPrazoFrete
                  {
                      TipoFrete = list.First().TipoFrete,
                      Prazo = list.Max(c => c.Prazo),
                      Valor = list.Sum(c => c.Valor)
-                 }).ToList();
+                 }).ToList().First();
 
-            return ValorDosFretes;
+                return ValorDosFretes;
+            }
+
+            return null;
         }
 
         private async Task<ValorPrazoFrete> CalcularValorPrazoFrete(String cepDestino, String tipoFrete, Pacote pacote)
@@ -56,6 +63,11 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Frete
                     Prazo = int.Parse(resultado.Servicos[0].PrazoEntrega),
                     Valor = double.Parse(resultado.Servicos[0].Valor.Replace(".", "").Replace(",", "."))
                 };
+            }
+            else if (resultado.Servicos[0].Erro == "008")
+            {
+                //EX. SEDEX10 - não entrega naquela região
+                return null;
             }
             else
             {
