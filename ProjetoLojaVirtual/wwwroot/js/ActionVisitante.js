@@ -5,30 +5,56 @@
     MudarQuantidadeProdutoCarrinho();
 
     MascaraCEP();
-    AJAXCalcularFrete();
+    AcaoCalcularFreteBTN();
+    AJAXCalcularFrete(false);
 });
 function MascaraCEP() {
     $(".cep").mask("00.000-000");
 }
-function AJAXCalcularFrete() {
-    $(".btn-calcular-frete").click(function () {
-        var cep = $(".cep").val().replace(".", "").replace("-", "");
+function AcaoCalcularFreteBTN() {
+    $(".btn-calcular-frete").click(function (e) {
+        AJAXCalcularFrete(true);
+        e.preventDefault();
+    });
+}
+function AJAXCalcularFrete(callByButton) {
 
-        //TODO - Fazer uma requisição AJAX.
+    var cep = $(".cep").val().replace(".", "").replace("-", "");
+
+    if (cep.length == 8) {
+        $(".container-frete").html("<br /> <br / ><img src='\\img\\loading.gif'/>");
+
         $.ajax({
             type: "GET",
-            url: "/carrinhoCompra/CalcularFrete?cepDestino=" + cep,
+            url: "/CarrinhoCompra/CalcularFrete?cepDestino=" + cep,
             error: function (data) {
+                MostrarMensagemDeErro("Opps! Tivemos um erro ao obter o Frete..." + data.Message);
                 console.info(data);
             },
             success: function (data) {
+                html = "";
+
+                for (var i = 0; i < data.length; i++) {
+                    var tipoFrete = data[i].tipoFrete;
+                    var valor = data[i].valor;
+                    var prazo = data[i].prazo;
+
+                    html += "<dl class=\"dlist-align\"><dt><input type=\"radio\" name=\"frete\" value=\"" + tipoFrete + "\" /></dt><dd>" + tipoFrete + " - " + numberToReal(valor) + " (" + prazo + " dias últeis)</dd></dl>";
+                }
+
+                $(".container-frete").html(html);
                 console.info(data);
-               
             }
         });
+    } else {
+        if (callByButton == true) {
+            MostrarMensagemDeErro("Digite um CEP para calcular o frete!")
 
-    });
+        }
+    }
+
 }
+
 function numberToReal(numero) {
     var numero = numero.toFixed(2).split('.');
     numero[0] = "R$ " + numero[0].split(/(?=(?:...)*$)/).join('.');
@@ -44,6 +70,7 @@ function MudarQuantidadeProdutoCarrinho() {
         }
     });
 }
+
 function OrquestradorDeAcoesProduto(operacao, botao) {
     OcultarMensagemDeErro();
     /*
@@ -107,7 +134,7 @@ function AJAXComunicarAlteracaoQuantidadeProduto(produto) {
             AtualizarQuantidadeEValor(produto);
         },
         success: function () {
-
+            AJAXCalcularFrete();
         }
     });
 }
@@ -118,6 +145,7 @@ function MostrarMensagemDeErro(mensagem) {
 function OcultarMensagemDeErro() {
     $(".alert-danger").css("display", "none");
 }
+
 function AtualizarQuantidadeEValor(produto) {
     produto.campoQuantidadeProdutoCarrinho.val(produto.quantidadeProdutoCarrinhoNova);
 
@@ -137,7 +165,6 @@ function AtualizarSubtotal() {
         Subtotal += ValorReais;
     })
     $(".subtotal").text(numberToReal(Subtotal));
-
 }
 function MudarImagePrincipalProduto() {
     $(".img-small-wrap img").click(function () {

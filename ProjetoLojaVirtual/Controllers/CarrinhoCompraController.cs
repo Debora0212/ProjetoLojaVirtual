@@ -86,9 +86,10 @@ namespace ProjetoLojaVirtual.Controllers
                 List<ProdutoItem> produtos = CarregarProdutoDB();
 
                 List<Pacote> pacotes = _calcularPacote.CalcularPacoteDeProdutos(produtos);
+
                 ValorPrazoFrete valorPAC = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.PAC, pacotes);
-                ValorPrazoFrete valorSEDEX = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.PAC, pacotes);
-                ValorPrazoFrete valorSEDEX10 = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.PAC, pacotes);
+                ValorPrazoFrete valorSEDEX = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX, pacotes);
+                ValorPrazoFrete valorSEDEX10 = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX10, pacotes);
 
                 List<ValorPrazoFrete> lista = new List<ValorPrazoFrete>();
                 if(valorPAC != null) lista.Add(valorPAC);

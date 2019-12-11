@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.Constants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,21 +30,23 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Frete
                 if (resultado != null)
                     ValorDosPacotesPorFrete.Add(resultado);
             }
-            if(ValorDosPacotesPorFrete.Count > 0)
+
+            if (ValorDosPacotesPorFrete.Count > 0)
             {
                 ValorPrazoFrete ValorDosFretes = ValorDosPacotesPorFrete
                 .GroupBy(a => a.TipoFrete)
-                 .Select(list => new ValorPrazoFrete
-                 {
-                     TipoFrete = list.First().TipoFrete,
-                     Prazo = list.Max(c => c.Prazo),
-                     Valor = list.Sum(c => c.Valor)
-                 }).ToList().First();
+                .Select(list => new ValorPrazoFrete
+                {
+                    TipoFrete = list.First().TipoFrete,
+                    Prazo = list.Max(c => c.Prazo),
+                    Valor = list.Sum(c => c.Valor)
+                }).ToList().First();
 
                 return ValorDosFretes;
             }
 
             return null;
+
         }
 
         private async Task<ValorPrazoFrete> CalcularValorPrazoFrete(String cepDestino, String tipoFrete, Pacote pacote)
@@ -53,25 +56,29 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Frete
             var avisoRecebimento = _configuration.GetValue<String>("Frete:AvisoRecebimento");
             var diametro = Math.Max(Math.Max(pacote.Comprimento, pacote.Largura), pacote.Altura);
 
+
             cResultado resultado = await _servico.CalcPrecoPrazoAsync("", "", tipoFrete, cepOrigem, cepDestino, pacote.Peso.ToString(), 1, pacote.Comprimento, pacote.Altura, pacote.Largura, diametro, maoPropria, 0, avisoRecebimento);
 
             if (resultado.Servicos[0].Erro == "0")
             {
+                var valorLimpo = resultado.Servicos[0].Valor.Replace(".", "");
+                var valorFinal = double.Parse(valorLimpo);
+
                 return new ValorPrazoFrete()
                 {
-                    TipoFrete = tipoFrete,
+                    TipoFrete = TipoFreteConstant.GetNames(tipoFrete),
                     Prazo = int.Parse(resultado.Servicos[0].PrazoEntrega),
-                    Valor = double.Parse(resultado.Servicos[0].Valor.Replace(".", "").Replace(",", "."))
+                    Valor = valorFinal
                 };
             }
             else if (resultado.Servicos[0].Erro == "008")
             {
-                //EX. SEDEX10 - não entrega naquela região
+                //Ex.: SEDEX10 - não entrega naquela região
                 return null;
             }
             else
             {
-                throw new Exception("Erro:" + resultado.Servicos[0].MsgErro);
+                throw new Exception("Erro: " + resultado.Servicos[0].MsgErro);
             }
         }
     }
