@@ -17,12 +17,25 @@ function AcaoCalcularFreteBTN() {
         e.preventDefault();
     });
 }
+
 function AJAXCalcularFrete(callByButton) {
+    if (callByButton == false) {
+        if ($.cookie('Carrinho.CEP') != undefined) {
+            $(".cep").val($.cookie('Carrinho.CEP'));
+        }
+    }
+
 
     var cep = $(".cep").val().replace(".", "").replace("-", "");
+    $.removecookie("Carrinho.TipoFrete");
 
     if (cep.length == 8) {
-        $(".container-frete").html("<br /> <br / ><img src='\\img\\loading.gif'/>");
+
+        $.cookie('Carrinho.CEP', $(".cep").val());
+        $(".container-frete").html("<br /><br /><img src='\\img\\loading.gif' />");
+        $(".frete").text("R$ 0,00");
+        $(".total").text("R$ 0,00");
+
 
         $.ajax({
             type: "GET",
@@ -39,23 +52,36 @@ function AJAXCalcularFrete(callByButton) {
                     var valor = data[i].valor;
                     var prazo = data[i].prazo;
 
-                    html += "<dl class=\"dlist-align\"><dt><input type=\"radio\" name=\"frete\" value=\"" + tipoFrete + "\" /></dt><dd>" + tipoFrete + " - " + numberToReal(valor) + " (" + prazo + " dias últeis)</dd></dl>";
+                    html += "<dl class=\"dlist-align\"><dt><input type=\"radio\" name=\"frete\" value=\"" + tipoFrete + "\" /><input type=\"hidden\" name=\"valor\" value=\"" + valor + "\" /></dt><dd>" + tipoFrete + " - " + numberToReal(valor) + " (" + prazo + " dias últeis)</dd></dl>";
                 }
 
                 $(".container-frete").html(html);
-                console.info(data);
+                $(".container-frete").find("input[type=radio]").change(function () {
+                    var valorFrete = parseFloat($(this).parent().find("input[type=hidden]").val());
+
+                    $.cookie("Carrinho.TipoFrete", $(this).val());
+
+                    $(".frete").text(numberToReal(valorFrete));
+
+                    var subtotal = parseFloat($(".subtotal").text().replace("R$", "").replace(".", "").replace(",", "."));
+                    console.info("Subtotal: " + subtotal);
+
+                    var total = valorFrete + subtotal;
+
+                    $(".total").text(numberToReal(total));
+                });
+                //console.info(data);
             }
         });
     } else {
         if (callByButton == true) {
-            MostrarMensagemDeErro("Digite um CEP para calcular o frete!")
-
+            $(".container-frete").html("");
+            MostrarMensagemDeErro("Digite o CEP para calcular o frete!");
         }
     }
-
 }
-
 function numberToReal(numero) {
+    //console.info(numero);
     var numero = numero.toFixed(2).split('.');
     numero[0] = "R$ " + numero[0].split(/(?=(?:...)*$)/).join('.');
     return numero.join(',');
@@ -70,7 +96,6 @@ function MudarQuantidadeProdutoCarrinho() {
         }
     });
 }
-
 function OrquestradorDeAcoesProduto(operacao, botao) {
     OcultarMensagemDeErro();
     /*
@@ -165,6 +190,8 @@ function AtualizarSubtotal() {
         Subtotal += ValorReais;
     })
     $(".subtotal").text(numberToReal(Subtotal));
+
+
 }
 function MudarImagePrincipalProduto() {
     $(".img-small-wrap img").click(function () {
