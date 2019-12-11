@@ -19,6 +19,7 @@ function AcaoCalcularFreteBTN() {
 }
 
 function AJAXCalcularFrete(callByButton) {
+    $(".btn-continuar").addClass("disabled"); 
     if (callByButton == false) {
         if ($.cookie('Carrinho.CEP') != undefined) {
             $(".cep").val($.cookie('Carrinho.CEP'));
@@ -27,7 +28,7 @@ function AJAXCalcularFrete(callByButton) {
 
 
     var cep = $(".cep").val().replace(".", "").replace("-", "");
-    $.removecookie("Carrinho.TipoFrete");
+    $.removeCookie("Carrinho.TipoFrete");
 
     if (cep.length == 8) {
 
@@ -57,9 +58,12 @@ function AJAXCalcularFrete(callByButton) {
 
                 $(".container-frete").html(html);
                 $(".container-frete").find("input[type=radio]").change(function () {
-                    var valorFrete = parseFloat($(this).parent().find("input[type=hidden]").val());
 
                     $.cookie("Carrinho.TipoFrete", $(this).val());
+                    $(".btn-continuar").removeClass("disabled");    
+
+
+                    var valorFrete = parseFloat($(this).parent().find("input[type=hidden]").val());
 
                     $(".frete").text(numberToReal(valorFrete));
 
@@ -96,6 +100,9 @@ function MudarQuantidadeProdutoCarrinho() {
         }
     });
 }
+
+
+
 function OrquestradorDeAcoesProduto(operacao, botao) {
     OcultarMensagemDeErro();
     /*
@@ -234,6 +241,8 @@ function MudarOrdenacao() {
 
     });
 }
+
+
 /*
  * ------------------ Classes --------------------
  */
