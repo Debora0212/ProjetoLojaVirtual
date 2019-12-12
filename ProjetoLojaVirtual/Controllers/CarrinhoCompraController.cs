@@ -11,27 +11,17 @@ using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
+using ProjetoLojaVirtual.Controllers.Base;
 
 namespace ProjetoLojaVirtual.Controllers
 {
-    public class CarrinhoCompraController : Controller
+    public class CarrinhoCompraController : BaseController
     {
-        private CookieCarrinhoCompra _cookieCarrinhoCompra;
-        private IProdutoRepository _produtoRepository;
-        private IMapper _mapper;
-        private WSCorreiosCalcularFrete _wscorreios;
-        private CalcularPacote _calcularPacote;
-        private CookieValorPrazoFrete _cookieValorPrazoFrete;
-
-        public CarrinhoCompraController(CookieCarrinhoCompra cookieCarrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete)
+        public CarrinhoCompraController(CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
         {
-            _cookieCarrinhoCompra = cookieCarrinhoCompra;
-            _produtoRepository = produtoRepository;
-            _mapper = mapper;
-            _wscorreios = wscorreios;
-            _calcularPacote = calcularPacote;
-            _cookieValorPrazoFrete = cookieValorPrazoFrete;
+
         }
+       
         public IActionResult Index()
         {
             List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
@@ -110,25 +100,6 @@ namespace ProjetoLojaVirtual.Controllers
             }
         }
 
-        private List<ProdutoItem> CarregarProdutoDB()
-        {
-            List<ProdutoItem> produtoItemNoCarrinho = _cookieCarrinhoCompra.Consultar();
-
-            List<ProdutoItem> produtoItemCompleto = new List<ProdutoItem>();
-
-            foreach (var item in produtoItemNoCarrinho)
-            {
-
-                Produto produto = _produtoRepository.ObterProduto(item.Id);
-
-                ProdutoItem produtoItem = _mapper.Map<ProdutoItem>(produto);
-                produtoItem.QuantidadeProdutoCarrinho = item.QuantidadeProdutoCarrinho;
-
-                produtoItemCompleto.Add(produtoItem);
-            }
-
-            return produtoItemCompleto;
-        }
     }
 
 }
