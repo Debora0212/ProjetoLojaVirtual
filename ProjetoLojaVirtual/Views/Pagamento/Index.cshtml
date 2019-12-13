@@ -48,11 +48,14 @@
                     </dl>
                     <dl class="dlist-align">
                         <dt>Frete:</dt>
-                        <dd class="text-right frete">PAC/SEDEX - R$ 0,00</dd>
+                        <dd class="text-right frete">@ViewBag.Frete.TipoFrete - @ViewBag.Frete.Valor.ToString("C")</dd>
                     </dl>
                     <dl class="dlist-align">
                         <dt>TOTAL:</dt>
-                        <dd class="text-right total">R$ 0,00</dd>
+                        @{ 
+                           decimal valorFrete = (decimal)ViewBag.Frete.Valor;
+                        }
+                        <dd class="text-right total">@((Subtotal + valorFrete).ToString("C"))</dd>
                     </dl>
                 </div>
             </div>

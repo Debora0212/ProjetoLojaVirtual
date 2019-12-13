@@ -133,6 +133,15 @@ namespace ProjetoLojaVirtual.Libraries.Lang {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Não foi selecionado o tipo de enviou!.
+        /// </summary>
+        public static string MSG_E009 {
+            get {
+                return ResourceManager.GetString("MSG_E009", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Registro salvo com sucesso!.
         /// </summary>
         public static string MSG_S001 {

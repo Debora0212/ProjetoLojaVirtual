@@ -1,4 +1,5 @@
 ﻿@model List<ProjetoLojaVirtual.Models.ProdutoAgregador.ProdutoItem>
+@inject ProjetoLojaVirtual.Libraries.Login.LoginCliente _loginCliente
 @{
     ViewData["Title"] = "Index";
     decimal Subtotal = 0;
@@ -79,7 +80,7 @@
                                             <small class="text-muted">(@item.Valor.ToString("C") cada)</small>
                                         </div>
                                     </td>
-                                    <td class="text-right">
+                                    <td class="text-right">                                    
                                         <a asp-controller="CarrinhoCompra" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger"> × Remove</a>
                                     </td>
                                 </tr>
@@ -139,7 +140,14 @@
                 </aside>
                 <aside class="col-md-4">
                     <div class="box">
-                        <a href="#" class="btn btn-primary btn-continuar disabled">Continuar</a>
+                        @if (_loginCliente.GetCliente() == null)
+                        {
+                            //TODO - Tela de Login/Cadastro
+                        }
+                        else
+                        {
+                            <a asp-action="Index" asp-controller="Pagamento" class="btn btn-primary btn-continuar disabled">Continuar</a>
+                        }
                     </div>
                 </aside>
             </div>

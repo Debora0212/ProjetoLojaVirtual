@@ -1,4 +1,5 @@
 ﻿@model List<Categoria>
+@inject ProjetoLojaVirtual.Libraries.Login.LoginCliente _loginCliente
 @{ 
     var pesquisa = Context.Request.Query["pesquisa"];
 }
@@ -44,8 +45,15 @@
         <form class="form-inline my-2 my-lg-0" method="get">
             <input class="form-control mr-sm-2" type="search" name="pesquisa" value="@pesquisa" placeholder="palavra" aria-label="Search">
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Pesquisa</button>
-            <a class="nav-link" asp-controller="Home" asp-action="Login"><i class="fas fa-user-alt"></i> Login</a>
-            <a class="nav-link"asp-controller="CarrinhoCompra" asp-action="Index"><i class="fas fa-shopping-cart"></i> Carrinho</a>
+            @if (_loginCliente.GetCliente() != null)
+            {
+                <a class="nav-link" asp-controller="Home" asp-action="Painel" asp-area="Cliente"><i class="fas fa-user-alt"></i>@_loginCliente.GetCliente().Nome</a>
+            }
+            else
+            {
+                <a class="nav-link" asp-controller="Home" asp-action="Login" asp-area="Cliente"><i class="fas fa-user-alt"></i> Entrar</a>
+            }
+            <a class="nav-link" asp-controller="CarrinhoCompra" asp-action="Index"><i class="fas fa-shopping-cart"></i> Carrinho</a>
         </form>
     </div>
 </nav>

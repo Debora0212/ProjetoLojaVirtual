@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace ProjetoLojaVirtual.Libraries.Cookie
 {
+
     public class Cookie
     {
         private IHttpContextAccessor _context;
@@ -48,12 +49,14 @@ namespace ProjetoLojaVirtual.Libraries.Cookie
             _context.HttpContext.Response.Cookies.Delete(Key);
         }
 
-        public string Consultar(string Key)
+        public string Consultar(string Key, bool Cript = true)
         {
-            var ValorCrypt = _context.HttpContext.Request.Cookies[Key];
-
-            var Valor = StringCipher.Decrypt(ValorCrypt, _configuration.GetValue<string>("KeyCrypt"));
-            return Valor;
+            var valor = _context.HttpContext.Request.Cookies[Key];
+            if (Cript)
+            {
+                valor = StringCipher.Decrypt(valor, _configuration.GetValue<string>("KeyCrypt"));
+            }
+            return valor;
         }
 
 

@@ -18,17 +18,13 @@ namespace ProjetoLojaVirtual.Controllers
 {
     public class HomeController : Controller
     {
-        private IClienteRepository _repositoryCliente;
         private INewsletterRepository _repositoryNewsletter;
-        private LoginCliente _loginCliente;
         private GerenciarEmail _gerenciarEmail;
         private IProdutoRepository _produtoRepository;
 
         public HomeController(IProdutoRepository produtoRepository, IClienteRepository repositoryCliente, INewsletterRepository repositoryNewsletter, LoginCliente loginCliente, GerenciarEmail gerenciarEmail)
         {
-            _repositoryCliente = repositoryCliente;
             _repositoryNewsletter = repositoryNewsletter;
-            _loginCliente = loginCliente;
             _gerenciarEmail = gerenciarEmail;
             _produtoRepository = produtoRepository;
         }
@@ -106,57 +102,6 @@ namespace ProjetoLojaVirtual.Controllers
             
             return View("Contato");
         }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult Login([FromForm]Cliente cliente)
-        {
-            Cliente clienteDB = _repositoryCliente.Login(cliente.Email, cliente.Senha);
-            if(clienteDB != null)
-            {
-                _loginCliente.Login(clienteDB);
-
-                return new RedirectResult(Url.Action(nameof(Painel)));
-            }
-            else
-            {
-                ViewData["MSG_E"] = "Usuário não encontrado, verifique o e-mail e senha digitado!";
-                return View();
-            }
-        }
-
-        [HttpGet]
-        [ClienteAutorizacao]
-        public IActionResult Painel()
-        {
-            return new ContentResult() { Content = "Este é o painel do cliente!" };
-        }
-
-        [HttpGet]
-        public IActionResult CadastroCliente()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult CadastroCliente([FromForm]Cliente cliente)
-        {
-            if (ModelState.IsValid)
-            {
-                _repositoryCliente.Cadastrar(cliente);
-
-                TempData["MSG_S"] = "Cadastro realizado com sucesso!";
-
-                //TODO -Implementar redirecionamento diferentes(Painel, carrinho de compras, etc).
-                return RedirectToAction(nameof(CadastroCliente));
-            }
-            return View();
-        }
-
+       
     }
 }

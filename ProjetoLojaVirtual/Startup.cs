@@ -43,7 +43,6 @@ namespace ProjetoLojaVirtual
             /*
              * AutoMapper
              */
-
             services.AddAutoMapper(config=>config.AddProfile<MappingProfile>());
 
             /*
@@ -83,8 +82,6 @@ namespace ProjetoLojaVirtual
             services.AddScoped<CookieValorPrazoFrete>();
             services.AddScoped<CalcularPacote>();
             services.AddScoped<WSCorreiosCalcularFrete>();
-            
-            
 
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -100,6 +97,7 @@ namespace ProjetoLojaVirtual
             services.AddMemoryCache(); //Guardar os dados na memória
             services.AddSession(Options =>
             {
+                Options.Cookie.IsEssential = true;
             });
 
             services.AddScoped<Sessao>();
