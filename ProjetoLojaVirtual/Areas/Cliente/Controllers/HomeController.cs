@@ -14,12 +14,12 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
     {
         private IClienteRepository _repositoryCliente;
         private LoginCliente _loginCliente;
-
         public HomeController(IClienteRepository repositoryCliente, LoginCliente loginCliente)
         {
             _repositoryCliente = repositoryCliente;
             _loginCliente = loginCliente;
         }
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -27,14 +27,22 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login([FromForm]Models.Cliente cliente)
+        public IActionResult Login([FromForm]Models.Cliente cliente, string returnUrl = null)
         {
             Models.Cliente clienteDB = _repositoryCliente.Login(cliente.Email, cliente.Senha);
+
             if (clienteDB != null)
             {
                 _loginCliente.Login(clienteDB);
 
-                return new RedirectResult(Url.Action(nameof(Painel)));
+                if (returnUrl == null)
+                {
+                    return new RedirectResult(Url.Action(nameof(Painel)));
+                }
+                else
+                {
+                    return LocalRedirectPermanent(returnUrl);
+                }
             }
             else
             {
@@ -47,7 +55,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
         [ClienteAutorizacao]
         public IActionResult Painel()
         {
-            return new ContentResult() { Content = "Este é o painel do cliente!" };
+            return new ContentResult() { Content = "Este é o Painel do Cliente!" };
         }
 
         [HttpGet]
@@ -55,21 +63,26 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
         {
             return View();
         }
-
         [HttpPost]
-        public IActionResult CadastroCliente([FromForm]Models.Cliente cliente)
+        public IActionResult CadastroCliente([FromForm]Models.Cliente cliente, string returnUrl = null)
         {
             if (ModelState.IsValid)
             {
                 _repositoryCliente.Cadastrar(cliente);
+                _loginCliente.Login(cliente);
 
                 TempData["MSG_S"] = "Cadastro realizado com sucesso!";
 
-                //TODO -Implementar redirecionamento diferentes(Painel, carrinho de compras, etc).
-                return RedirectToAction(nameof(CadastroCliente));
+               if(returnUrl == null)
+                {
+                    return RedirectToAction("Index", "Home", new { area = "" });
+                }
+                else
+                {
+                    return LocalRedirectPermanent(returnUrl);
+                }
             }
             return View();
         }
-
     }
 }

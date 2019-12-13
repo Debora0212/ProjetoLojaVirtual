@@ -52,10 +52,10 @@
                     </dl>
                     <dl class="dlist-align">
                         <dt>TOTAL:</dt>
-                        @{ 
-                           decimal valorFrete = (decimal)ViewBag.Frete.Valor;
+                        @{
+                            decimal valorFrete = (decimal)ViewBag.Frete.Valor;
                         }
-                        <dd class="text-right total">@((Subtotal + valorFrete).ToString("C"))</dd>
+                        <dd class="text-right total">@( (Subtotal + valorFrete).ToString("C") )</dd>
                     </dl>
                 </div>
             </div>

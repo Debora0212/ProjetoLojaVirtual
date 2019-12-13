@@ -5,9 +5,9 @@
     decimal Subtotal = 0;
 }
 
+
 @if (Model.Count > 0)
 {
-
     <div class="container">
         <section id="order">
             <br />
@@ -16,6 +16,7 @@
             <div class="alert alert-danger" style="display: none;" role="alert">
 
             </div>
+
 
 
             <div id="code_cart">
@@ -60,7 +61,7 @@
                                                 <input type="hidden" class="inputProdutoId" value="@item.Id" />
                                                 <input type="hidden" class="inputQuantidadeEstoque" value="@item.Quantidade" />
                                                 <input type="hidden" class="inputValorUnitario" value="@item.Valor" />
-                                                <div class="input-group-append">
+                                                <div class="input-group-prepend">
                                                     <a href="#" class="btn btn-primary diminuir"> - </a>
                                                 </div>
                                                 <input type="text" style="width: 60px; text-align: center" readonly="readonly" class="form-control inputQuantidadeProdutoCarrinho" value="@item.QuantidadeProdutoCarrinho">
@@ -80,7 +81,7 @@
                                             <small class="text-muted">(@item.Valor.ToString("C") cada)</small>
                                         </div>
                                     </td>
-                                    <td class="text-right">                                    
+                                    <td class="text-right">
                                         <a asp-controller="CarrinhoCompra" asp-action="RemoverItem" asp-route-id="@item.Id" class="btn btn-outline-danger"> × Remove</a>
                                     </td>
                                 </tr>
@@ -142,7 +143,7 @@
                     <div class="box">
                         @if (_loginCliente.GetCliente() == null)
                         {
-                            //TODO - Tela de Login/Cadastro
+                            <a asp-action="Login" asp-controller="Home" asp-area="Cliente" asp-route-returnUrl="@Url.Action("Index", "Pagamento", new { area = ""})" class="btn btn-primary btn-continuar disabled">Continuar</a>
                         }
                         else
                         {
@@ -157,12 +158,13 @@
     </div>
 }
 else
-{ <div class="container">
+{
+    <div class="container">
         <br />
         <br />
         <div class="row">
             <div class="col-md-12">
-                Ainda não adicionou um produto ao seu carrinho?<a asp-controller="Home" asp-action="Index"> Clique aqui </a> e começe a comprar
+                Ainda não adicionou um produto ao seu carrinho? <a asp-controller="Home" asp-action="Index">Clique aqui</a> e começe a comprar
             </div>
             <br />
             <br />
@@ -173,5 +175,4 @@ else
             </div>
         </div>
     </div>
-
 }

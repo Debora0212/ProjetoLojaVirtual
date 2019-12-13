@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Controllers.Base;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 using ProjetoLojaVirtual.Libraries.Cookie;
+using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
@@ -22,24 +23,25 @@ namespace ProjetoLojaVirtual.Controllers
             _cookie = cookie;
         }
 
+        [ClienteAutorizacao]
         public IActionResult Index()
         {
             var tipoFreteSelecionadoPeloUsuario = _cookie.Consultar("Carrinho.TipoFrete", false);
             if (tipoFreteSelecionadoPeloUsuario != null)
             {
-                var Frete = _cookieValorPrazoFrete.Consultar().Where(a => a.TipoFrete == tipoFreteSelecionadoPeloUsuario).FirstOrDefault();
+                var frete = _cookieValorPrazoFrete.Consultar().Where(a => a.TipoFrete == tipoFreteSelecionadoPeloUsuario).FirstOrDefault();
 
-                if (Frete != null)
+                if (frete != null)
                 {
-                    ViewBag.Frete = Frete;
+                    ViewBag.Frete = frete;
                     List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
 
                     return View(produtoItemCompleto);
                 }
             }
+
             TempData["MSG_E"] = Mensagem.MSG_E009;
             return RedirectToAction("Index", "CarrinhoCompra");
-
         }
     }
 }

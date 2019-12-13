@@ -8,7 +8,7 @@ using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
-{   
+{
     [Area("Colaborador")]
     public class HomeController : Controller
     {
@@ -53,6 +53,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             return RedirectToAction("Login", "Home");
         }
 
+
+
         public IActionResult RecuperarSenha()
         {
             return View();
@@ -62,6 +64,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         {
             return View();
         }
+
+
 
         [ColaboradorAutorizacao]
         public IActionResult Painel()
