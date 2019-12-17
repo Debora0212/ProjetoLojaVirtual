@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Login;
+using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
@@ -84,5 +85,18 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
             }
             return View();
         }
+
+        [HttpGet]
+        public IActionResult CadastroEnderecoEntrega()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CadastroEnderecoEntrega([FromForm]EnderecoEntrega entrega)
+        {
+            return View();
+        }
+ 
     }
 }

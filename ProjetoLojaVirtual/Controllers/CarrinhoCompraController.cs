@@ -63,13 +63,20 @@ namespace ProjetoLojaVirtual.Controllers
                 _cookieCarrinhoCompra.Atualizar(item);
                 return Ok(new { mensagem = Mensagem.MSG_S001});
             }
-           
         }
+
         public IActionResult RemoverItem(int id)
         {
             _cookieCarrinhoCompra.Remover(new ProdutoItem() { Id = id });
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult EnderecoEntrega()
+        {
+            return View();
+        }
+
+       
 
         public async Task<IActionResult> CalcularFrete(int cepDestino)
         {

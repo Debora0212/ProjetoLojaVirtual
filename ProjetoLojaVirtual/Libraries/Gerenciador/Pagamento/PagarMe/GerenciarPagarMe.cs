@@ -113,16 +113,16 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
 
             transaction.Billing = new Billing
             {
-                Name = "Morty",
+                Name = cliente.Nome,
                 Address = new Address()
                 {
                     Country = "br",
-                    State = "sp",
-                    City = "Cotia",
-                    Neighborhood = "Rio Cotia",
-                    Street = "Rua Matrix",
-                    StreetNumber = "213",
-                    Zipcode = "04250000"
+                    State = cliente.Estado,
+                    City = cliente.Cidade,
+                    Neighborhood = cliente.Bairro,
+                    Street = cliente.Endereco + " " + cliente.Complemento,
+                    StreetNumber = cliente.Numero,
+                    Zipcode = Mascara.Remover( cliente.CEP )
                 }
             };
 
