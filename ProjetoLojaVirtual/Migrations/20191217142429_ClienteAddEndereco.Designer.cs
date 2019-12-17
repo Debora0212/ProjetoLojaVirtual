@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoLojaVirtual.Database;
 
 namespace ProjetoLojaVirtual.Migrations
 {
     [DbContext(typeof(LojaVirtualContext))]
-    partial class LojaVirtualContextModelSnapshot : ModelSnapshot
+    [Migration("20191217142429_ClienteAddEndereco")]
+    partial class ClienteAddEndereco
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -45,9 +47,6 @@ namespace ProjetoLojaVirtual.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Bairro")
-                        .IsRequired();
 
                     b.Property<string>("CEP")
                         .IsRequired()

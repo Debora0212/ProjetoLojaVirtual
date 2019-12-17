@@ -5,9 +5,40 @@
     MudarQuantidadeProdutoCarrinho();
 
     MascaraCEP();
+    AJAXBuscarCEP();
     AcaoCalcularFreteBTN();
     AJAXCalcularFrete(false);
 });
+function AJAXBuscarCEP() {
+    $("#CEP").keyup(function () {
+        OcultarMensagemDeErro();
+
+        if ($(this).val().length == 10) {
+
+            var cep = RemoverMascara($(this).val());
+            $.ajax({
+                type: "GET",
+                url: "https://viacep.com.br/ws/" + cep + "/json/?callback=callback_name",
+                dataType: "jsonp",
+                error: function (data) {
+                    MostrarMensagemDeErro("Opps! tivemos um erro na busca pelo CEP! Parece que os servidores estão offline!");
+                },
+                success: function (data) {
+                    if (data.erro == undefined) {
+                        $("#Estado").val(data.uf);
+                        $("#Cidade").val(data.localidade);
+                        $("#Endereco").val(data.logradouro);
+                        $("#Bairro").val(data.bairro);
+                        $("#Complemento").val(data.complemento);
+                    } else {
+                        MostrarMensagemDeErro("O CEP informado não existe!");
+                    }
+
+                }
+            });
+        }
+    });
+}
 function MascaraCEP() {
     $(".cep").mask("00.000-000");
 }
@@ -19,7 +50,7 @@ function AcaoCalcularFreteBTN() {
 }
 
 function AJAXCalcularFrete(callByButton) {
-    $(".btn-continuar").addClass("disabled"); 
+    $(".btn-continuar").addClass("disabled");
     if (callByButton == false) {
         if ($.cookie('Carrinho.CEP') != undefined) {
             $(".cep").val($.cookie('Carrinho.CEP'));
@@ -60,10 +91,11 @@ function AJAXCalcularFrete(callByButton) {
                 $(".container-frete").find("input[type=radio]").change(function () {
 
                     $.cookie("Carrinho.TipoFrete", $(this).val());
-                    $(".btn-continuar").removeClass("disabled");    
-
+                    $(".btn-continuar").removeClass("disabled");
 
                     var valorFrete = parseFloat($(this).parent().find("input[type=hidden]").val());
+
+
 
                     $(".frete").text(numberToReal(valorFrete));
 
@@ -258,4 +290,8 @@ class ProdutoQuantidadeEValor {
         this.campoQuantidadeProdutoCarrinho = campoQuantidadeProdutoCarrinho;
         this.campoValor = campoValor;
     }
+}
+
+function RemoverMascara(valor) {
+    return valor.replace(".", "").replace("-", "");
 }
