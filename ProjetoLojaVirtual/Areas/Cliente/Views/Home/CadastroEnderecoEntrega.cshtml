@@ -1,4 +1,4 @@
-﻿@model  EnderecoEntrega
+﻿@model EnderecoEntrega
 @{
     ViewData["Title"] = "Cadastro de endereço";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -10,7 +10,7 @@
             <div class="row">
                 <aside class="col-sm-6">
                     <h3 class="subtitle-doc">
-                        Cadastro de endereço
+                        Cadastro endereço
                     </h3>
                     <div id="code_register_1">
                         <div class="card">
@@ -32,8 +32,7 @@
                                     <label asp-for="CEP">CEP</label>
                                     <input type="text" asp-for="CEP" class="cep form-control" placeholder="">
                                     <span asp-validation-for="CEP"></span>
-                                    <div class="alert alert-danger" style="display:none;">
-                                    </div>
+                                    <div class="alert alert-danger" style="display:none;"></div>
                                 </div>
                                 <div class="form-group">
                                     <label asp-for="Estado">Estado</label>
@@ -45,6 +44,7 @@
                                     <input type="text" asp-for="Cidade" readonly="readonly" class="form-control" placeholder="">
                                     <span asp-validation-for="Cidade"></span>
                                 </div>
+
                                 <div class="form-group">
                                     <label asp-for="Bairro">Bairro</label>
                                     <input type="text" asp-for="Bairro" readonly="readonly" class="form-control" placeholder="">
@@ -66,9 +66,9 @@
                                     <span asp-validation-for="Numero"></span>
                                 </div>
                                 <div class="form-group">
+                                    <button type="submit" class="btn btn-primary btn-block"> Cadastrar </button>
                                 </div>
                             </article>
-                            <div class="border-top card-body text-center">Já tem um conta? <a asp-action="Login" asp-controller="Home">Entre</a></div>
                         </div>
                     </div>
                 </aside>
@@ -76,4 +76,3 @@
         </section>
     </main>
 </form>
-

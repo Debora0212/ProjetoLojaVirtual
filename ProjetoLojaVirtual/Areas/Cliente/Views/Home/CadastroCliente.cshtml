@@ -1,4 +1,4 @@
-﻿@model ProjetoLojaVirtual.Models.Cliente
+﻿@model LojaVirtual.Models.Cliente
 @{
     ViewData["Title"] = "CadastroCliente";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -70,8 +70,7 @@
                                     <label asp-for="CEP">CEP</label>
                                     <input type="text" asp-for="CEP" class="cep form-control" placeholder="">
                                     <span asp-validation-for="CEP"></span>
-                                    <div class="alert alert-danger" style="display:none;">
-                                    </div>
+                                    <div class="alert alert-danger" style="display:none;"></div>
                                 </div>
                                 <div class="form-group">
                                     <label asp-for="Estado">Estado</label>
@@ -83,6 +82,7 @@
                                     <input type="text" asp-for="Cidade" readonly="readonly" class="form-control" placeholder="">
                                     <span asp-validation-for="Cidade"></span>
                                 </div>
+
                                 <div class="form-group">
                                     <label asp-for="Bairro">Bairro</label>
                                     <input type="text" asp-for="Bairro" readonly="readonly" class="form-control" placeholder="">

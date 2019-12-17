@@ -13,10 +13,13 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
     [Area("Cliente")]
     public class HomeController : Controller
     {
+        private IEnderecoEntregaRepository _repositoryEnderecoEntrega;
         private IClienteRepository _repositoryCliente;
         private LoginCliente _loginCliente;
-        public HomeController(IClienteRepository repositoryCliente, LoginCliente loginCliente)
+
+        public HomeController(IEnderecoEntregaRepository repositoryEnderecoEntrega, IClienteRepository repositoryCliente, LoginCliente loginCliente)
         {
+            _repositoryEnderecoEntrega = repositoryEnderecoEntrega;
             _repositoryCliente = repositoryCliente;
             _loginCliente = loginCliente;
         }
@@ -74,7 +77,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 
                 TempData["MSG_S"] = "Cadastro realizado com sucesso!";
 
-               if(returnUrl == null)
+                if (returnUrl == null)
                 {
                     return RedirectToAction("Index", "Home", new { area = "" });
                 }
@@ -86,17 +89,35 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
             return View();
         }
 
+
         [HttpGet]
         public IActionResult CadastroEnderecoEntrega()
         {
+            //TODO - melhorar o Html do campo Nome.
+            //TODO - Remover do JS a opcao de carregar o CEP quando ele esta no cookie para esta tela.
             return View();
         }
 
         [HttpPost]
-        public IActionResult CadastroEnderecoEntrega([FromForm]EnderecoEntrega entrega)
+        public IActionResult CadastroEnderecoEntrega([FromForm]EnderecoEntrega enderecoentrega, string returnUrl = null)
         {
+            if (ModelState.IsValid)
+            {
+                enderecoentrega.ClienteId = _loginCliente.GetCliente().Id;
+
+                _repositoryEnderecoEntrega.Cadastrar(enderecoentrega);
+
+                if (returnUrl == null)
+                {
+                    //TODO - Listagem de endereços.
+                }
+                else
+                {
+                    return LocalRedirectPermanent(returnUrl);
+                }
+            }
             return View();
         }
- 
+
     }
 }

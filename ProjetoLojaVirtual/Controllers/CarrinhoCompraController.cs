@@ -12,23 +12,30 @@ using ProjetoLojaVirtual.Repositories.Contracts;
 using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
 using ProjetoLojaVirtual.Controllers.Base;
+using ProjetoLojaVirtual.Libraries.Login;
+using ProjetoLojaVirtual.Libraries.Filtro;
 
 namespace ProjetoLojaVirtual.Controllers
 {
     public class CarrinhoCompraController : BaseController
     {
-        public CarrinhoCompraController(CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
-        {
+        private LoginCliente _loginCliente;
+        private IEnderecoEntregaRepository _enderecoEntregaRepository;
 
+        public CarrinhoCompraController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
+        {
+            _loginCliente = loginCliente;
+            _enderecoEntregaRepository = enderecoEntregaRepository;
         }
-       
+
         public IActionResult Index()
         {
             List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
 
             return View(produtoItemCompleto);
         }
-    
+
+
         //Item ID = ID Produto
         public IActionResult AdicionarItem(int id)
         {
@@ -49,7 +56,7 @@ namespace ProjetoLojaVirtual.Controllers
         public IActionResult AlterarQuantidade(int id, int quantidade)
         {
             Produto produto = _produtoRepository.ObterProduto(id);
-            if(quantidade < 1)
+            if (quantidade < 1)
             {
                 return BadRequest(new { mensagem = Mensagem.MSG_E007 });
             }
@@ -61,22 +68,27 @@ namespace ProjetoLojaVirtual.Controllers
             {
                 var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = quantidade };
                 _cookieCarrinhoCompra.Atualizar(item);
-                return Ok(new { mensagem = Mensagem.MSG_S001});
+                return Ok(new { mensagem = Mensagem.MSG_S001 });
             }
         }
-
         public IActionResult RemoverItem(int id)
         {
             _cookieCarrinhoCompra.Remover(new ProdutoItem() { Id = id });
             return RedirectToAction(nameof(Index));
         }
 
+        [ClienteAutorizacao]
         public IActionResult EnderecoEntrega()
         {
+            Cliente cliente = _loginCliente.GetCliente();
+            IList<EnderecoEntrega> enderecos = _enderecoEntregaRepository.ObterTodosEnderecoEntregaCliente(cliente.Id);
+
+            ViewBag.Cliente = cliente;
+            ViewBag.Enderecos = enderecos;
+
             return View();
         }
 
-       
 
         public async Task<IActionResult> CalcularFrete(int cepDestino)
         {
@@ -91,14 +103,21 @@ namespace ProjetoLojaVirtual.Controllers
                 ValorPrazoFrete valorSEDEX10 = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX10, pacotes);
 
                 List<ValorPrazoFrete> lista = new List<ValorPrazoFrete>();
-                if(valorPAC != null) lista.Add(valorPAC);
+                if (valorPAC != null) lista.Add(valorPAC);
                 if (valorSEDEX != null) lista.Add(valorSEDEX);
                 if (valorSEDEX10 != null) lista.Add(valorSEDEX10);
 
-                _cookieValorPrazoFrete.Cadastrar(lista);
+                var frete = new Frete()
+                {
+                    CEP = cepDestino,
+                    //CodCarrinho = Hashcode,
+                    ListaValores = lista
+                };
 
-                return Ok(lista);
-            }   
+                //_cookieValorPrazoFrete.Cadastrar(frete);
+
+                return Ok(frete);
+            }
             catch (Exception e)
             {
                 _cookieValorPrazoFrete.Remover();
@@ -106,7 +125,5 @@ namespace ProjetoLojaVirtual.Controllers
                 return BadRequest(e);
             }
         }
-
     }
-
 }
