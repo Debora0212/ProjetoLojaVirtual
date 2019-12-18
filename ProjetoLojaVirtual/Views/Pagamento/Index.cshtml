@@ -1,4 +1,4 @@
-﻿@model List<ProjetoLojaVirtual.Models.ProdutoAgregador.ProdutoItem>
+﻿@model CartaoCredito
 @{
     ViewData["Title"] = "Index";
     decimal Subtotal = 0;
@@ -11,13 +11,13 @@
         <div class="col-md-6">
             <div id="code_itemside_img2">
                 <div class="box items-bordered-wrap">
-                    @foreach (var item in Model)
+                    @foreach (var item in ViewBag.Produtos)
                     {
                         <figure class="itemside">
                             <div class="aside">
                                 @if (item.Imagens.Count > 0)
                                 {
-                                    <img src="@item.Imagens.First().Caminho" class="img-sm">
+                                    <img src="@(((List<Imagem>)item.Imagens).First().Caminho)" class="img-sm">
                                 }
                                 else
                                 {
@@ -82,16 +82,16 @@
                         <div class="tab-content">
                             <div class="tab-pane fade active show" id="nav-tab-card">
                                 <p class="alert alert-danger">Some text success or error</p>
-                                <form role="form">
+                                <form role="form" method="post">
                                     <div class="form-group">
-                                        <label for="username">Nome (no cartão)</label>
-                                        <input type="text" class="form-control" name="username" placeholder="" required="">
+                                        <label asp-for="NomeNoCartao"></label>
+                                        <input type="text" asp-for="NomeNoCartao" class="form-control" placeholder="">
+                                        <span asp-validation-for="NomeNoCartao"></span>
                                     </div>
-
                                     <div class="form-group">
-                                        <label for="cardNumber">Número cartão</label>
+                                        <label asp-for="NumeroCartao"></label>
                                         <div class="input-group">
-                                            <input type="text" class="form-control" name="cardNumber" placeholder="">
+                                            <input type="text" asp-for="NumeroCartao" class="form-control" placeholder="">
                                             <div class="input-group-append">
                                                 <span class="input-group-text text-muted">
                                                     <i class="fab fa-cc-visa"></i> &nbsp; <i class="fab fa-cc-amex"></i> &nbsp;
@@ -99,26 +99,29 @@
                                                 </span>
                                             </div>
                                         </div>
+                                        <span asp-validation-for="NumeroCartao"></span>
                                     </div>
-
                                     <div class="row">
                                         <div class="col-sm-8">
                                             <div class="form-group">
-                                                <label><span class="hidden-xs">Vecimento</span> </label>
+                                                <label for="VencimentoMM" class="hidden-xs">Vencimento</label>
                                                 <div class="input-group">
-                                                    <input type="number" class="form-control" placeholder="MM" name="">
-                                                    <input type="number" class="form-control" placeholder="YY" name="">
+                                                    <input type="number" class="form-control" placeholder="MM" asp-for="VencimentoMM">
+                                                    <input type="number" class="form-control" placeholder="YY" asp-for="VencimentoYY">
                                                 </div>
+                                                <span asp-validation-for="VencimentoMM"></span>
+                                                <span asp-validation-for="VencimentoYY"></span>
                                             </div>
                                         </div>
                                         <div class="col-sm-4">
                                             <div class="form-group">
-                                                <label data-toggle="tooltip" title="" data-original-title="3 digits code on back side of the card">Cód. segurança <i class="fa fa-question-circle"></i></label>
-                                                <input type="number" class="form-control" required="">
+                                                <label asp-for="CodigoSeguranca" data-toggle="tooltip" title="" data-original-title="3 digits code on back side of the card">Cód. segurança <i class="fa fa-question-circle"></i></label>
+                                                <input type="number" class="form-control" asp-for="CodigoSeguranca">
+                                                <span asp-validation-for="CodigoSeguranca"></span>
                                             </div>
                                         </div>
                                     </div>
-                                    <button class="subscribe btn btn-primary btn-block" type="button"> Confirmar  </button>
+                                    <button class="subscribe btn btn-primary btn-block" type="submit"> Confirmar  </button>
                                 </form>
                             </div>
                             <div class="tab-pane fade" id="nav-tab-paypal">

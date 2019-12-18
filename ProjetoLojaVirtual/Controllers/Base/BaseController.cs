@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
+using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Seguranca;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
@@ -15,6 +16,8 @@ namespace ProjetoLojaVirtual.Controllers.Base
 {
     public class BaseController : Controller
     {
+        protected LoginCliente _loginCliente;
+        protected IEnderecoEntregaRepository _enderecoEntregaRepository;
         protected CookieCarrinhoCompra _cookieCarrinhoCompra;
         protected IProdutoRepository _produtoRepository;
         protected IMapper _mapper;
@@ -22,8 +25,10 @@ namespace ProjetoLojaVirtual.Controllers.Base
         protected CalcularPacote _calcularPacote;
         protected CookieFrete _cookieFrete;
 
-        public BaseController(CookieCarrinhoCompra cookieCarrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieFrete)
+        public BaseController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra cookieCarrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieFrete)
         {
+            _loginCliente = loginCliente;
+            _enderecoEntregaRepository = enderecoEntregaRepository;
             _cookieCarrinhoCompra = cookieCarrinhoCompra;
             _produtoRepository = produtoRepository;
             _mapper = mapper;

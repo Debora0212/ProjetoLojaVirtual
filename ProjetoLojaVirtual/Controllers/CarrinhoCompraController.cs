@@ -21,13 +21,9 @@ namespace ProjetoLojaVirtual.Controllers
 {
     public class CarrinhoCompraController : BaseController
     {
-        private LoginCliente _loginCliente;
-        private IEnderecoEntregaRepository _enderecoEntregaRepository;
 
-        public CarrinhoCompraController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
-        {
-            _loginCliente = loginCliente;
-            _enderecoEntregaRepository = enderecoEntregaRepository;
+        public CarrinhoCompraController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieValorPrazoFrete) : base(loginCliente, enderecoEntregaRepository, carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
+        {            
         }
 
         public IActionResult Index()
