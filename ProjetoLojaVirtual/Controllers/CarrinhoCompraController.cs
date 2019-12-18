@@ -85,6 +85,7 @@ namespace ProjetoLojaVirtual.Controllers
             Cliente cliente = _loginCliente.GetCliente();
             IList<EnderecoEntrega> enderecos = _enderecoEntregaRepository.ObterTodosEnderecoEntregaCliente(cliente.Id);
 
+            ViewBag.Produtos = CarregarProdutoDB();
             ViewBag.Cliente = cliente;
             ViewBag.Enderecos = enderecos;
 

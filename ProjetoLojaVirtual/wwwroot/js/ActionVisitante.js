@@ -15,7 +15,10 @@ function AJAXEnderecoEntregaCalcularFrete() {
     $("input[name=endereco]").change(function () {
         var cep = RemoverMascara($(this).parent().find("input[name=cep]").val());
 
+        EnderecoEntregaCardsLimpar();
+        LimparValores();
         EnderecoEntregaCardsLoading();
+        $(".btn-continuar").addClass("disabled");
 
 
         $.ajax({
@@ -34,19 +37,27 @@ function AJAXEnderecoEntregaCalcularFrete() {
                     var valor = data.listaValores[i].valor;
                     var prazo = data.listaValores[i].prazo;
 
-                    $(".card-title")[i].innerHTML = tipoFrete;
-                    $(".card-text")[i].innerHTML = "Prazo de " + prazo + " dias.";
+                    $(".card-title")[i].innerHTML = "<label for='" + tipoFrete + "'>" + tipoFrete + "</label>";
+                    $(".card-text")[i].innerHTML = "<label for='" + tipoFrete + "'>Prazo de " + prazo + " dias.</label>";
                     $(".card-footer .text-muted")[i].innerHTML = "<input type=\"radio\" name=\"frete\" value=\"" + tipoFrete + "\" id='" + tipoFrete + "' /> <strong><label for='" + tipoFrete + "'>" + numberToReal(valor) + "</label></strong>";
 
-                    if ($.cookie("Carrinho.TipoFrete") == tipoFrete) {
-                        $(".card-footer .text-muted").find("input[name=frete]").attr("selected", "selected");
+                    console.info($.cookie("Carrinho.TipoFrete") + " - " + tipoFrete)
+                    console.info($.cookie("Carrinho.TipoFrete") == tipoFrete);
+
+                    if ($.cookie("Carrinho.TipoFrete") != undefined && $.cookie("Carrinho.TipoFrete") == tipoFrete) {
+                        $(".card-footer .text-muted input[name=frete]").eq(i).attr("checked", "checked");
+                        SelecionarTipoFreteStyle($(".card-footer .text-muted input[name=frete]").eq(i));
+
                         $(".btn-continuar").removeClass("disabled");
                     }
                 }
 
                 $(".card-footer .text-muted").find("input[name=frete]").change(function () {
-                    $.cookie("Carrinho.TipoFrete", $(this).val());
+                    $.cookie("Carrinho.TipoFrete", $(this).val(), { path: '/' });
                     $(".btn-continuar").removeClass("disabled");
+
+                    SelecionarTipoFreteStyle($(this));
+
                 });
 
 
@@ -67,6 +78,29 @@ function AJAXEnderecoEntregaCalcularFrete() {
             }
         });
     });
+}
+function SelecionarTipoFreteStyle(obj) {
+    $(".card-body").css("background-color", "white");
+    $(".card-footer").css("background-color", "rgba(0,0,0,.03)");
+
+
+    obj.parent().parent().parent().find(".card-body").css("background-color", "#D7EAFF");
+    obj.parent().parent().parent().find(".card-footer").css("background-color", "#D7EAFF");
+
+    AtualizarValores();
+}
+function AtualizarValores() {
+    var produto = parseFloat($(".texto-produto").text().replace("R$", "").replace(".", "").replace(",", "."));
+    var frete = parseFloat($(".card-footer input[name=frete]:checked").parent().find("label").text().replace("R$", "").replace(".", "").replace(",", "."));
+
+    var total = produto + frete;
+
+    $(".texto-frete").text(numberToReal(frete));
+    $(".texto-total").text(numberToReal(total));
+}
+function LimparValores() {
+    $(".texto-frete").text("-");
+    $(".texto-total").text("-");
 }
 function EnderecoEntregaCardsLoading() {
     for (var i = 0; i < 3; i++) {
