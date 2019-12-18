@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
+using ProjetoLojaVirtual.Libraries.Seguranca;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
@@ -18,16 +20,16 @@ namespace ProjetoLojaVirtual.Controllers.Base
         protected IMapper _mapper;
         protected WSCorreiosCalcularFrete _wscorreios;
         protected CalcularPacote _calcularPacote;
-        protected CookieValorPrazoFrete _cookieValorPrazoFrete;
+        protected CookieFrete _cookieFrete;
 
-        public BaseController(CookieCarrinhoCompra cookieCarrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete)
+        public BaseController(CookieCarrinhoCompra cookieCarrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieFrete)
         {
             _cookieCarrinhoCompra = cookieCarrinhoCompra;
             _produtoRepository = produtoRepository;
             _mapper = mapper;
             _wscorreios = wscorreios;
             _calcularPacote = calcularPacote;
-            _cookieValorPrazoFrete = cookieValorPrazoFrete;
+            _cookieFrete = cookieFrete;
         }
         protected List<ProdutoItem> CarregarProdutoDB()
         {
@@ -46,6 +48,11 @@ namespace ProjetoLojaVirtual.Controllers.Base
             }
 
             return produtoItemCompleto;
+        }
+
+        protected string GerarHash(object obj)
+        {
+            return StringMD5.MD5Hash(JsonConvert.SerializeObject(obj));
         }
     }
 }

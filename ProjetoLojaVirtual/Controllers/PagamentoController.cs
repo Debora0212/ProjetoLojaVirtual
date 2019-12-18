@@ -18,7 +18,7 @@ namespace ProjetoLojaVirtual.Controllers
     public class PagamentoController : BaseController
     {
         private Cookie _cookie;
-        public PagamentoController(Cookie cookie, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
+        public PagamentoController(Cookie cookie, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
         {
             _cookie = cookie;
         }
@@ -29,7 +29,8 @@ namespace ProjetoLojaVirtual.Controllers
             var tipoFreteSelecionadoPeloUsuario = _cookie.Consultar("Carrinho.TipoFrete", false);
             if (tipoFreteSelecionadoPeloUsuario != null)
             {
-                var frete = _cookieValorPrazoFrete.Consultar().Where(a => a.TipoFrete == tipoFreteSelecionadoPeloUsuario).FirstOrDefault();
+                /*
+                var frete = _cookieFrete.Consultar().Where(a => a.TipoFrete == tipoFreteSelecionadoPeloUsuario).FirstOrDefault();
 
                 if (frete != null)
                 {
@@ -38,6 +39,7 @@ namespace ProjetoLojaVirtual.Controllers
 
                     return View(produtoItemCompleto);
                 }
+                */
             }
 
             TempData["MSG_E"] = Mensagem.MSG_E009;

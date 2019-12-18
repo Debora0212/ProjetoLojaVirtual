@@ -14,6 +14,8 @@ using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
 using ProjetoLojaVirtual.Controllers.Base;
 using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Filtro;
+using Newtonsoft.Json;
+using ProjetoLojaVirtual.Libraries.Seguranca;
 
 namespace ProjetoLojaVirtual.Controllers
 {
@@ -22,7 +24,7 @@ namespace ProjetoLojaVirtual.Controllers
         private LoginCliente _loginCliente;
         private IEnderecoEntregaRepository _enderecoEntregaRepository;
 
-        public CarrinhoCompraController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieValorPrazoFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
+        public CarrinhoCompraController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieValorPrazoFrete) : base(carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
         {
             _loginCliente = loginCliente;
             _enderecoEntregaRepository = enderecoEntregaRepository;
@@ -94,34 +96,42 @@ namespace ProjetoLojaVirtual.Controllers
         {
             try
             {
-                List<ProdutoItem> produtos = CarregarProdutoDB();
-
-                List<Pacote> pacotes = _calcularPacote.CalcularPacoteDeProdutos(produtos);
-
-                ValorPrazoFrete valorPAC = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.PAC, pacotes);
-                ValorPrazoFrete valorSEDEX = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX, pacotes);
-                ValorPrazoFrete valorSEDEX10 = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX10, pacotes);
-
-                List<ValorPrazoFrete> lista = new List<ValorPrazoFrete>();
-                if (valorPAC != null) lista.Add(valorPAC);
-                if (valorSEDEX != null) lista.Add(valorSEDEX);
-                if (valorSEDEX10 != null) lista.Add(valorSEDEX10);
-
-                var frete = new Frete()
+                //Verefica se existe no frete o calculo para o mesmo CEP e produto.
+                Frete frete = _cookieFrete.Consultar().Where(a => a.CEP == cepDestino && a.CodCarrinho == GerarHash(_cookieCarrinhoCompra.Consultar())).FirstOrDefault();
+                if (frete != null)
                 {
-                    CEP = cepDestino,
-                    //CodCarrinho = Hashcode,
-                    ListaValores = lista
-                };
+                    return Ok(frete);
+                }
+                else
+                {
+                    List<ProdutoItem> produtos = CarregarProdutoDB();
 
-                //_cookieValorPrazoFrete.Cadastrar(frete);
+                    List<Pacote> pacotes = _calcularPacote.CalcularPacoteDeProdutos(produtos);
 
-                return Ok(frete);
+                    ValorPrazoFrete valorPAC = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.PAC, pacotes);
+                    ValorPrazoFrete valorSEDEX = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX, pacotes);
+                    ValorPrazoFrete valorSEDEX10 = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.SEDEX10, pacotes);
+
+                    List<ValorPrazoFrete> lista = new List<ValorPrazoFrete>();
+                    if (valorPAC != null) lista.Add(valorPAC);
+                    if (valorSEDEX != null) lista.Add(valorSEDEX);
+                    if (valorSEDEX10 != null) lista.Add(valorSEDEX10);
+
+
+                    frete = new Frete()
+                    {
+                        CEP = cepDestino,
+                        CodCarrinho = GerarHash(_cookieCarrinhoCompra.Consultar()),
+                        ListaValores = lista
+                    };
+
+                    _cookieFrete.Cadastrar(frete);
+
+                    return Ok(frete);
+                }
             }
             catch (Exception e)
             {
-                _cookieValorPrazoFrete.Remover();
-
                 return BadRequest(e);
             }
         }
