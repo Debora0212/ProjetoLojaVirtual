@@ -25,6 +25,7 @@ using AutoMapper;
 using ProjetoLojaVirtual.Libraries.AutoMapper;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
 using WSCorreios;
+using ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe;
 
 namespace ProjetoLojaVirtual
 {
@@ -105,10 +106,11 @@ namespace ProjetoLojaVirtual
             services.AddScoped<ProjetoLojaVirtual.Libraries.Cookie.Cookie>();
             services.AddScoped<LoginCliente>();
             services.AddScoped<LoginColaborador>();
+            services.AddScoped<GerenciarPagarMe>();
 
             services.AddMvc(options=>{
                 options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(x => "O campo deve ser preenchido!");
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 
             string connection = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=LojaVirtual;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 

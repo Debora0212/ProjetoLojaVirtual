@@ -7,6 +7,7 @@ using PagarMe;
 using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.ProdutoAgregador;
 
 namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
 {
@@ -46,7 +47,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                     Documents = new[] {
                         new Document{
                             Type = DocumentType.Cpf,
-                            Number = Mascara.Remover( cliente.CPF )
+                            Number = Mascara.Remover(cliente.CPF)
                         }
                     },
                     PhoneNumbers = new string[]
@@ -66,8 +67,8 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             }
         }
 
-        /*
-        public object GerarPagCartaoCredito(CartaoCredito cartao)
+
+        public object GerarPagCartaoCredito(CartaoCredito cartao, EnderecoEntrega enderecoEntrega, ValorPrazoFrete valorFrete, List<ProdutoItem> produtos)
         {
             Cliente cliente = _loginCliente.GetCliente();
 
@@ -77,15 +78,13 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             Card card = new Card();
             card.Number = cartao.NumeroCartao;
             card.HolderName = cartao.NomeNoCartao;
-            card.ExpirationDate = cartao.Vencimento;
+            card.ExpirationDate = cartao.VencimentoMM + cartao.VencimentoYY;
             card.Cvv = cartao.CodigoSeguranca;
 
             card.Save();
 
             Transaction transaction = new Transaction();
 
-            //TODO - Valor Total
-            transaction.Amount = 2100;
             transaction.Card = new Card
             {
                 Id = card.Id
@@ -101,13 +100,13 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                 Documents = new[] {
                         new Document{
                             Type = DocumentType.Cpf,
-                            Number = Mascara.Remover( cliente.CPF )
+                            Number = Mascara.Remover(cliente.CPF)
                         }
                     },
                 PhoneNumbers = new string[]
-                   {
+                    {
                         "+55" + Mascara.Remover( cliente.Telefone )
-                   },
+                    },
                 Birthday = cliente.Nascimento.ToString("yyyy-MM-dd")
             };
 
@@ -122,53 +121,59 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                     Neighborhood = cliente.Bairro,
                     Street = cliente.Endereco + " " + cliente.Complemento,
                     StreetNumber = cliente.Numero,
-                    Zipcode = Mascara.Remover( cliente.CEP )
+                    Zipcode = Mascara.Remover(cliente.CEP)
                 }
             };
 
             var Today = DateTime.Now;
 
+            var fee = Convert.ToDecimal(valorFrete.Valor);
+            decimal valorTotal = fee;
+
             transaction.Shipping = new Shipping
             {
-                Name = "Rick",
-                Fee = 100,
-                DeliveryDate = Today.AddDays(4).ToString("yyyy-MM-dd"),
+                Name = enderecoEntrega.Nome,
+                Fee = Convert.ToInt32(valorFrete.Valor),
+                DeliveryDate = Today.AddDays(_configuration.GetValue<int>("Frete:DiasParaPostagem")).AddDays(valorFrete.Prazo).ToString("yyyy-MM-dd"),
                 Expedited = false,
                 Address = new Address()
                 {
                     Country = "br",
-                    State = "sp",
-                    City = "Cotia",
-                    Neighborhood = "Rio Cotia",
-                    Street = "Rua Matrix",
-                    StreetNumber = "213",
-                    Zipcode = "04250000"
+                    State = enderecoEntrega.Estado,
+                    City = enderecoEntrega.Cidade,
+                    Neighborhood = enderecoEntrega.Bairro,
+                    Street = enderecoEntrega.Endereco + " " + enderecoEntrega.Complemento,
+                    StreetNumber = enderecoEntrega.Numero,
+                    Zipcode = Mascara.Remover(enderecoEntrega.CEP)
                 }
             };
 
-            transaction.Item = new[]
+            Item[] itens = new Item[produtos.Count];
+
+            for (var i = 0; i < produtos.Count; i++)
             {
-  new Item()
-  {
-    Id = "1",
-    Title = "Little Car",
-    Quantity = 1,
-    Tangible = true,
-    UnitPrice = 1000
-  },
-  new Item()
-  {
-    Id = "2",
-    Title = "Baby Crib",
-    Quantity = 1,
-    Tangible = true,
-    UnitPrice = 1000
-  }
-};
+                var item = produtos[i];
+
+                var itemA = new Item()
+                {
+                    Id = item.Id.ToString(),
+                    Title = item.Nome,
+                    Quantity = item.QuantidadeProdutoCarrinho,
+                    Tangible = true,
+                    UnitPrice = Convert.ToInt32(item.Valor)
+                };
+
+                itens[i] = itemA;
+            }
+
+            transaction.Item = itens;
 
             transaction.Save();
+
+            return new { TransactionId = transaction.Id };
+
         }
-        */
+
     }
 
 }
