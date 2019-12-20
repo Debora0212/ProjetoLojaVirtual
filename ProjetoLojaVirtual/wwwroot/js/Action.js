@@ -8,10 +8,10 @@
     });
     $('.dinheiro').mask('000.000.000.000.000,00', { reverse: true });
 
-    AjaxUploadImagemProduto();
+    AJAXUploadImagemProduto();
 });
 
-function AjaxUploadImagemProduto() {
+function AJAXUploadImagemProduto() {
     $(".img-upload").click(function () {
         $(this).parent().parent().find(".input-file").click();
     });
@@ -47,7 +47,7 @@ function AjaxUploadImagemProduto() {
         var BtnExcluir = $(this).parent().find(".btn-imagem-excluir");
 
         //Apresenta Imagem Loading.
-        Imagem.attr("src", "/img/loading.gif"); 
+        Imagem.attr("src", "/img/loading.gif");
         Imagem.addClass("thumb");
 
         //TODO - Requisição Ajax enviado a Formulario
@@ -59,7 +59,7 @@ function AjaxUploadImagemProduto() {
             processData: false,
             error: function () {
                 alert("Erro no envio do arquivo!");
-                Imagem.attr("src", "/img/imagem-padrao.png")
+                Imagem.attr("src", "/img/imagem-padrao.png");
                 Imagem.removeClass("thumb");
             },
             success: function (data) {

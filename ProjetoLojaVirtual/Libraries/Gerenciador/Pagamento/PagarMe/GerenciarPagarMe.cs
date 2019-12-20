@@ -133,7 +133,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             transaction.Shipping = new Shipping
             {
                 Name = enderecoEntrega.Nome,
-                Fee = Convert.ToInt32(valorFrete.Valor),
+                Fee = Mascara.ConverterValorPagarMe(fee),
                 DeliveryDate = Today.AddDays(_configuration.GetValue<int>("Frete:DiasParaPostagem")).AddDays(valorFrete.Prazo).ToString("yyyy-MM-dd"),
                 Expedited = false,
                 Address = new Address()
@@ -160,13 +160,16 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                     Title = item.Nome,
                     Quantity = item.QuantidadeProdutoCarrinho,
                     Tangible = true,
-                    UnitPrice = Convert.ToInt32(item.Valor)
+                    UnitPrice = Mascara.ConverterValorPagarMe(item.Valor)
                 };
 
+                valorTotal += (item.Valor * item.QuantidadeProdutoCarrinho);
                 itens[i] = itemA;
             }
 
             transaction.Item = itens;
+            transaction.Amount = Mascara.ConverterValorPagarMe(valorTotal);
+
 
             transaction.Save();
 

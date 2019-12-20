@@ -21,11 +21,25 @@ namespace ProjetoLojaVirtual.Controllers
 {
     public class CarrinhoCompraController : BaseController
     {
-
-        public CarrinhoCompraController(LoginCliente loginCliente, IEnderecoEntregaRepository enderecoEntregaRepository, CookieCarrinhoCompra carrinhoCompra, IProdutoRepository produtoRepository, IMapper mapper, WSCorreiosCalcularFrete wscorreios, CalcularPacote calcularPacote, CookieFrete cookieValorPrazoFrete) : base(loginCliente, enderecoEntregaRepository, carrinhoCompra, produtoRepository, mapper, wscorreios, calcularPacote, cookieValorPrazoFrete)
-        {            
-        }
-
+        public CarrinhoCompraController(
+            LoginCliente loginCliente,
+            CookieCarrinhoCompra carrinhoCompra,
+            IEnderecoEntregaRepository enderecoEntregaRepository,
+            IProdutoRepository produtoRepository,
+            IMapper mapper,
+            WSCorreiosCalcularFrete wscorreios,
+            CalcularPacote calcularPacote,
+            CookieFrete cookieValorPrazoFrete)
+            : base(
+                  loginCliente,
+                  enderecoEntregaRepository,
+                  carrinhoCompra,
+                  produtoRepository,
+                  mapper,
+                  wscorreios,
+                  calcularPacote,
+                  cookieValorPrazoFrete)
+        { }
         public IActionResult Index()
         {
             List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
@@ -93,7 +107,7 @@ namespace ProjetoLojaVirtual.Controllers
         {
             try
             {
-                //Verefica se existe no frete o calculo para o mesmo CEP e produto.
+                //Verifica se existe no Frete o calculo para o mesmo CEP e produtos.
                 Frete frete = _cookieFrete.Consultar().Where(a => a.CEP == cepDestino && a.CodCarrinho == GerarHash(_cookieCarrinhoCompra.Consultar())).FirstOrDefault();
                 if (frete != null)
                 {
@@ -101,8 +115,8 @@ namespace ProjetoLojaVirtual.Controllers
                 }
                 else
                 {
-                    List<ProdutoItem> produtos = CarregarProdutoDB();
 
+                    List<ProdutoItem> produtos = CarregarProdutoDB();
                     List<Pacote> pacotes = _calcularPacote.CalcularPacoteDeProdutos(produtos);
 
                     ValorPrazoFrete valorPAC = await _wscorreios.CalcularFrete(cepDestino.ToString(), TipoFreteConstant.PAC, pacotes);
@@ -113,7 +127,6 @@ namespace ProjetoLojaVirtual.Controllers
                     if (valorPAC != null) lista.Add(valorPAC);
                     if (valorSEDEX != null) lista.Add(valorSEDEX);
                     if (valorSEDEX10 != null) lista.Add(valorSEDEX10);
-
 
                     frete = new Frete()
                     {

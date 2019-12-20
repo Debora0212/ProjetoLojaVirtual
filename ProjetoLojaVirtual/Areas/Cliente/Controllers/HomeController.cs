@@ -93,8 +93,8 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
         [HttpGet]
         public IActionResult CadastroEnderecoEntrega()
         {
-            //TODO - melhorar o Html do campo Nome.
-            //TODO - Remover do JS a opcao de carregar o CEP quando ele esta no cookie para esta tela.
+            //TODO - Melhorar o HTML do campo Nome.
+            //TODO - Remover do JS a opção de Carregar o CEP quando ele está no cookie para esta tela.
             return View();
         }
 

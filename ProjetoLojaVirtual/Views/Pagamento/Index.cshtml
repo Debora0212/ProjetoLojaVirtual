@@ -17,7 +17,7 @@
                             <div class="aside">
                                 @if (item.Imagens.Count > 0)
                                 {
-                                    <img src="@(((List<Imagem>)item.Imagens).First().Caminho)" class="img-sm">
+                                    <img src="@item.Imagens.First().Caminho" class="img-sm">
                                 }
                                 else
                                 {
@@ -61,6 +61,7 @@
             </div>
         </div>
         <div class="col-md-6">
+            @{ await Html.RenderPartialAsync("~/Views/Shared/_Mensagem.cshtml"); }
             <div id="code_payment2">
 
                 <article class="card">
@@ -89,6 +90,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label asp-for="NumeroCartao"></label>
+
                                         <div class="input-group">
                                             <input type="text" asp-for="NumeroCartao" class="form-control" placeholder="">
                                             <div class="input-group-append">
@@ -103,7 +105,7 @@
                                     <div class="row">
                                         <div class="col-sm-8">
                                             <div class="form-group">
-                                                <label for="VencimentoMM" class="hidden-xs">Vencimento</label>
+                                                <label for="VecimentoMM" class="hidden-xs">Vecimento</label>
                                                 <div class="input-group">
                                                     <input type="number" class="form-control" placeholder="MM" asp-for="VencimentoMM">
                                                     <input type="number" class="form-control" placeholder="YY" asp-for="VencimentoYY">

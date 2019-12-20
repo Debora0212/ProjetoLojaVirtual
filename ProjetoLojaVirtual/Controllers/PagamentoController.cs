@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using PagarMe;
 using ProjetoLojaVirtual.Controllers.Base;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 using ProjetoLojaVirtual.Libraries.Cookie;
@@ -48,7 +50,6 @@ namespace ProjetoLojaVirtual.Controllers
             _cookie = cookie;
             _gerenciarPagarMe = gerenciarPagarMe;
         }
-
         [ClienteAutorizacao]
         [HttpGet]
         public IActionResult Index()
@@ -82,9 +83,31 @@ namespace ProjetoLojaVirtual.Controllers
                 ValorPrazoFrete frete = ObterFrete(enderecoEntrega.CEP.ToString());
                 List<ProdutoItem> produtos = CarregarProdutoDB();
 
-                dynamic pagarmeResposta = _gerenciarPagarMe.GerarPagCartaoCredito(cartaoCredito, enderecoEntrega, frete, produtos);
+                try
+                {
+                    dynamic pagarmeResposta = _gerenciarPagarMe.GerarPagCartaoCredito(cartaoCredito, enderecoEntrega, frete, produtos);
 
-                return new ContentResult() { Content = "Sucesso! " };
+                    return new ContentResult() { Content = "Sucesso! " + pagarmeResposta.TransactionId };
+                }
+                catch (PagarMeException e)
+                {
+                    StringBuilder sb = new StringBuilder();
+
+                    if (e.Error.Errors.Count() > 0)
+                    {
+                        sb.Append("Erro no pagamento: ");
+                        foreach (var erro in e.Error.Errors)
+                        {
+                            sb.Append("- " + erro.Message + "<br />");
+                        }
+                    }
+                    TempData["MSG_E"] = sb.ToString();
+
+                    return Index();
+                }
+
+
+
             }
             else
             {
@@ -116,6 +139,7 @@ namespace ProjetoLojaVirtual.Controllers
             else
             {
                 var endereco = _enderecoEntregaRepository.ObterEnderecoEntrega(enderecoEntregaId);
+                enderecoEntrega = endereco;
             }
 
             return enderecoEntrega;
@@ -135,5 +159,4 @@ namespace ProjetoLojaVirtual.Controllers
             return null;
         }
     }
-
 }
