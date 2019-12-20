@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using PagarMe;
 using ProjetoLojaVirtual.Controllers.Base;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
@@ -17,6 +18,7 @@ using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
+using ProjetoLojaVirtual.Models.ViewModels.Pagamento;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Controllers
@@ -50,6 +52,7 @@ namespace ProjetoLojaVirtual.Controllers
             _cookie = cookie;
             _gerenciarPagarMe = gerenciarPagarMe;
         }
+
         [ClienteAutorizacao]
         [HttpGet]
         public IActionResult Index()
@@ -59,12 +62,22 @@ namespace ProjetoLojaVirtual.Controllers
             {
                 var enderecoEntrega = ObterEndereco();
                 var carrinhoHash = GerarHash(_cookieCarrinhoCompra.Consultar());
-
                 int cep = int.Parse(Mascara.Remover(enderecoEntrega.CEP));
-
-                ViewBag.Frete = ObterFrete(cep.ToString());
                 List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
+                var frete = ObterFrete(cep.ToString());
+
+                var total = ObterValorTotalCompra(produtoItemCompleto, frete);
+                var parcelamento = _gerenciarPagarMe.CalcularPagamentoParcelado(total);
+
+                ViewBag.Frete = frete;
                 ViewBag.Produtos = produtoItemCompleto;
+                ViewBag.Parcelamentos = parcelamento.Select(a => new SelectListItem(
+                    String.Format(
+                        "{0}x {1} {2} - TOTAL: {3}",
+                        a.Numero, a.ValorPorParcela.ToString("C"), (a.Juros) ? "c/ juros" : "s/ juros", a.Valor.ToString("C")
+                    ),
+                    a.Numero.ToString()
+                )).ToList();
 
                 return View("Index");
             }
@@ -74,7 +87,7 @@ namespace ProjetoLojaVirtual.Controllers
 
         [HttpPost]
         [ClienteAutorizacao]
-        public IActionResult Index([FromForm]CartaoCredito cartaoCredito)
+        public IActionResult Index([FromForm]IndexViewModel indexViewModel)
         {
             if (ModelState.IsValid)
             {
@@ -82,10 +95,11 @@ namespace ProjetoLojaVirtual.Controllers
                 EnderecoEntrega enderecoEntrega = ObterEndereco();
                 ValorPrazoFrete frete = ObterFrete(enderecoEntrega.CEP.ToString());
                 List<ProdutoItem> produtos = CarregarProdutoDB();
+                var parcela = _gerenciarPagarMe.CalcularPagamentoParcelado(ObterValorTotalCompra(produtos, frete)).Where(a => a.Numero == indexViewModel.Parcelamento.Numero).First();
 
                 try
                 {
-                    dynamic pagarmeResposta = _gerenciarPagarMe.GerarPagCartaoCredito(cartaoCredito, enderecoEntrega, frete, produtos);
+                    dynamic pagarmeResposta = _gerenciarPagarMe.GerarPagCartaoCredito(indexViewModel.CartaoCredito, enderecoEntrega, frete, produtos);
 
                     return new ContentResult() { Content = "Sucesso! " + pagarmeResposta.TransactionId };
                 }
@@ -139,7 +153,6 @@ namespace ProjetoLojaVirtual.Controllers
             else
             {
                 var endereco = _enderecoEntregaRepository.ObterEnderecoEntrega(enderecoEntregaId);
-                enderecoEntrega = endereco;
             }
 
             return enderecoEntrega;
@@ -157,6 +170,18 @@ namespace ProjetoLojaVirtual.Controllers
                 return frete.ListaValores.Where(a => a.TipoFrete == tipoFreteSelecionadoPeloUsuario).FirstOrDefault();
             }
             return null;
+        }
+
+        private decimal ObterValorTotalCompra(List<ProdutoItem> produtos, ValorPrazoFrete frete)
+        {
+            decimal total = Convert.ToDecimal(frete.Valor);
+
+            foreach (var produto in produtos)
+            {
+                total += produto.Valor;
+            }
+
+            return total;
         }
     }
 }

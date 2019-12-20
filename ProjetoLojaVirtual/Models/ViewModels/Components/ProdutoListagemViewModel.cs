@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using X.PagedList;
 
-namespace ProjetoLojaVirtual.Models.ViewModels
+namespace ProjetoLojaVirtual.Models.ViewModels.Components
 {
     public class ProdutoListagemViewModel
     {

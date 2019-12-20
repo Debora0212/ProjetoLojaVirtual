@@ -78,7 +78,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             Card card = new Card();
             card.Number = cartao.NumeroCartao;
             card.HolderName = cartao.NomeNoCartao;
-            card.ExpirationDate = cartao.VencimentoMM + cartao.VencimentoYY;
+            card.ExpirationDate = cartao.VecimentoMM + cartao.VecimentoYY;
             card.Cvv = cartao.CodigoSeguranca;
 
             card.Save();
@@ -135,7 +135,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                 Name = enderecoEntrega.Nome,
                 Fee = Mascara.ConverterValorPagarMe(fee),
                 DeliveryDate = Today.AddDays(_configuration.GetValue<int>("Frete:DiasParaPostagem")).AddDays(valorFrete.Prazo).ToString("yyyy-MM-dd"),
-                Expedited = false,
+                Expedited = false,  
                 Address = new Address()
                 {
                     Country = "br",
@@ -174,10 +174,42 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             transaction.Save();
 
             return new { TransactionId = transaction.Id };
+        }
+
+
+        public List<Parcelamento> CalcularPagamentoParcelado(decimal valor)
+        {
+            List<Parcelamento> lista = new List<Parcelamento>();
+
+            int maxParcelamento = _configuration.GetValue<int>("Pagamento:PagarMe:MaxParcelas");
+            int parcelaPagaVendedor = _configuration.GetValue<int>("Pagamento:PagarMe:ParcelaPagaVendedor");
+            decimal juros = _configuration.GetValue<decimal>("Pagamento:PagarMe:Juros"); 
+
+            for(int i= 1; i <= maxParcelamento; i++)
+            {
+                Parcelamento parcelamento = new Parcelamento();
+                parcelamento.Numero = i;
+
+                if(i > parcelaPagaVendedor)
+                {
+                    int quantidadeParcelasComJuros = i - parcelaPagaVendedor;
+                    decimal valorDoJuros = valor * juros / 100;
+
+                    parcelamento.Valor = quantidadeParcelasComJuros * valorDoJuros + valor;
+                    parcelamento.ValorPorParcela = parcelamento.Valor / parcelamento.Numero;
+                    parcelamento.Juros = true;
+                }
+                else
+                {
+                    parcelamento.Valor = valor;
+                    parcelamento.ValorPorParcela = parcelamento.Valor / parcelamento.Numero;
+                    parcelamento.Juros = false;
+                }
+                lista.Add(parcelamento);
+            }
 
         }
 
     }
-
 }
 
