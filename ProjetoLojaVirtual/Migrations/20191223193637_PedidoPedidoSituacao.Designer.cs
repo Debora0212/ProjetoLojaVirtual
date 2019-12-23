@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProjetoLojaVirtual.Database;
 
 namespace ProjetoLojaVirtual.Migrations
 {
     [DbContext(typeof(LojaVirtualContext))]
-    partial class LojaVirtualContextModelSnapshot : ModelSnapshot
+    [Migration("20191223193637_PedidoPedidoSituacao")]
+    partial class PedidoPedidoSituacao
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -194,9 +196,9 @@ namespace ProjetoLojaVirtual.Migrations
 
                     b.Property<int?>("ClienteId");
 
-                    b.Property<string>("DadosProdutos");
-
                     b.Property<string>("DadosTransaction");
+
+                    b.Property<string>("DadosProdutos");
 
                     b.Property<DateTime>("DataRegistro");
 

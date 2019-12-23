@@ -76,6 +76,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             card.Save();
 
             Transaction transaction = new Transaction();
+            transaction.PaymentMethod = PaymentMethod.CreditCard;
             /*
              * TODO - transaction.postbackurl
              * - Parâmetro importante para que seu site seja informado sobre todas as mudanças de status ocorridas no Pagar.Me.

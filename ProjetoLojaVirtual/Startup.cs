@@ -58,6 +58,8 @@ namespace ProjetoLojaVirtual
             services.AddScoped<IProdutoRepository, ProdutoRepository>();
             services.AddScoped<IImagemRepository, ImagemRepository>();
             services.AddScoped<IEnderecoEntregaRepository, EnderecoEntregaRepository>();
+            services.AddScoped<IPedidoRepository, PedidoRepository>();
+            services.AddScoped<IPedidoSituacaoRepository, PedidoSituacaoRepository>();
 
             /*
              *SMTP 

@@ -29,18 +29,23 @@ namespace ProjetoLojaVirtual.Controllers
     {
         private Cookie _cookie;
         private GerenciarPagarMe _gerenciarPagarMe;
+        private IPedidoRepository _pedidoRepository;
+        private IPedidoSituacaoRepository _pedidoSituacaoRepository;
 
         public PagamentoController(
             GerenciarPagarMe gerenciarPagarMe,
             LoginCliente loginCliente,
             Cookie cookie,
             CookieCarrinhoCompra carrinhoCompra,
-            IEnderecoEntregaRepository enderecoEntregaRepository,
-            IProdutoRepository produtoRepository,
+            IPedidoRepository pedidoRepository,
+            IPedidoSituacaoRepository pedidoSituacaoRepository,
+            IEnderecoEntregaRepository enderecoEntregaRepository,           
+            IProdutoRepository produtoRepository,          
             IMapper mapper,
             WSCorreiosCalcularFrete wscorreios,
             CalcularPacote calcularPacote,
-            CookieFrete cookieValorPrazoFrete)
+            CookieFrete cookieValorPrazoFrete          
+            )
             : base(
                   loginCliente,
                   enderecoEntregaRepository,
@@ -50,11 +55,13 @@ namespace ProjetoLojaVirtual.Controllers
                   wscorreios,
                   calcularPacote,
                   cookieValorPrazoFrete)
-        {
-            _cookie = cookie;
-            _gerenciarPagarMe = gerenciarPagarMe;
+        {       
+            _pedidoRepository = pedidoRepository;
+            _pedidoSituacaoRepository = pedidoSituacaoRepository;
+            _cookie = cookie;     
+            _gerenciarPagarMe = gerenciarPagarMe;          
         }
-       
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -82,6 +89,26 @@ namespace ProjetoLojaVirtual.Controllers
                 try
                 {
                     Transaction transaction = _gerenciarPagarMe.GerarPagCartaoCredito(indexViewModel.CartaoCredito, parcela, enderecoEntrega, frete, produtos);
+
+                    Pedido pedido = new Pedido();
+                    pedido.ClienteId = int.Parse(transaction.Customer.Id);
+                    pedido.TransactionId = transaction.Id;
+                    pedido.FreteEmpresa = "ECT-Correios";
+                    pedido.FormPagamento = (transaction.PaymentMethod == 0) ? "Cartão de Credito" : "Boleto";
+                    pedido.ValorTotal = ObterValorTotalCompra(produtos);
+                    pedido.DadosTransaction = transaction; // Serializar;
+                    pedido.DadosProdutos = produtos;// Serializar;
+                    pedido.DataRegistro = DateTime.Now;
+                    pedido.Situacao = "";//TODO -Situacao - criar constants.
+
+                    _pedidoRepository.Cadastrar(pedido);
+                    PedidoSituacao pedidoSituacao = new PedidoSituacao();
+                    pedidoSituacao.PedidoId = pedido.Id;
+                    pedidoSituacao.Data = DateTime.Now;
+                    pedidoSituacao.Dados = new { Transaction = transaction, Produtos = produtos };//JSON
+                    pedidoSituacao.Situacao = "";
+
+                    _pedidoRepository.Cadastrar(pedidoSituacao);
 
                     return new ContentResult() { Content = "Sucesso! Cartão de Crédito" + transaction.Id };
                 }
