@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
 using PagarMe;
 using ProjetoLojaVirtual.Controllers.Base;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
@@ -17,9 +18,11 @@ using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Models.ViewModels.Pagamento;
 using ProjetoLojaVirtual.Repositories.Contracts;
+
 
 namespace ProjetoLojaVirtual.Controllers
 {
@@ -80,7 +83,6 @@ namespace ProjetoLojaVirtual.Controllers
         {
             if (ModelState.IsValid)
             {
-                //TODO - Salvar o pedido (Class), Redirecionar para a tela de pedido concluido;
                 EnderecoEntrega enderecoEntrega = ObterEndereco();
                 ValorPrazoFrete frete = ObterFrete();
                 List<ProdutoItem> produtos = CarregarProdutoDB();
@@ -89,28 +91,10 @@ namespace ProjetoLojaVirtual.Controllers
                 try
                 {
                     Transaction transaction = _gerenciarPagarMe.GerarPagCartaoCredito(indexViewModel.CartaoCredito, parcela, enderecoEntrega, frete, produtos);
+                    Pedido pedido = SalvarPedido(produtos, transaction);
 
-                    Pedido pedido = new Pedido();
-                    pedido.ClienteId = int.Parse(transaction.Customer.Id);
-                    pedido.TransactionId = transaction.Id;
-                    pedido.FreteEmpresa = "ECT-Correios";
-                    pedido.FormPagamento = (transaction.PaymentMethod == 0) ? "Cartão de Credito" : "Boleto";
-                    pedido.ValorTotal = ObterValorTotalCompra(produtos);
-                    pedido.DadosTransaction = transaction; // Serializar;
-                    pedido.DadosProdutos = produtos;// Serializar;
-                    pedido.DataRegistro = DateTime.Now;
-                    pedido.Situacao = "";//TODO -Situacao - criar constants.
-
-                    _pedidoRepository.Cadastrar(pedido);
-                    PedidoSituacao pedidoSituacao = new PedidoSituacao();
-                    pedidoSituacao.PedidoId = pedido.Id;
-                    pedidoSituacao.Data = DateTime.Now;
-                    pedidoSituacao.Dados = new { Transaction = transaction, Produtos = produtos };//JSON
-                    pedidoSituacao.Situacao = "";
-
-                    _pedidoRepository.Cadastrar(pedidoSituacao);
-
-                    return new ContentResult() { Content = "Sucesso! Cartão de Crédito" + transaction.Id };
+                    //TODO - Remover o estoque dos produtos.
+                    return new RedirectToActionResult("Index", "Pedido", new { id = pedido.Id });
                 }
                 catch (PagarMeException e)
                 {
@@ -137,8 +121,10 @@ namespace ProjetoLojaVirtual.Controllers
             {
                 Transaction transaction = _gerenciarPagarMe.GerarBoleto(valorTotal);
 
-                //TODO - Redirecionar para Página de Sucesso!
-                return new ContentResult() { Content = "Sucesso! Boleto - " + transaction.Id };
+                Pedido pedido = SalvarPedido(produtos, transaction);
+
+                //TODO - Remover o estoque dos produtos.
+                return new RedirectToActionResult("Index", "Pedido", new { id = pedido.Id});
 
             }
             catch (PagarMeException e)
@@ -153,7 +139,26 @@ namespace ProjetoLojaVirtual.Controllers
 
 
 
+        private Pedido SalvarPedido(List<ProdutoItem> produtos, Transaction transaction)
+        {
+            TransacaoPagarMe transacaoPagarMe = _mapper.Map<TransacaoPagarMe>(transaction);
 
+            Pedido pedido = _mapper.Map<TransacaoPagarMe, Pedido>(transacaoPagarMe);
+            pedido = _mapper.Map<List<ProdutoItem>, Pedido>(produtos, pedido);
+
+            pedido.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
+
+            _pedidoRepository.Cadastrar(pedido);
+
+            TransactionProduto tp = new TransactionProduto { Transaction = transacaoPagarMe, Produtos = produtos };
+            PedidoSituacao pedidoSituacao = _mapper.Map<Pedido, PedidoSituacao>(pedido);
+            pedidoSituacao = _mapper.Map<TransactionProduto, PedidoSituacao>(tp, pedidoSituacao);
+
+            pedidoSituacao.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
+
+            _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+            return pedido;
+        }
 
         private Parcelamento BuscarParcelamento(List<ProdutoItem> produtos, int numero)
         {

@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using Newtonsoft.Json;
+using PagarMe;
+using ProjetoLojaVirtual.Libraries.Json.Resolver;
+using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Models.ProdutoAgregador;
 
 namespace ProjetoLojaVirtual.Libraries.AutoMapper
@@ -14,8 +19,32 @@ namespace ProjetoLojaVirtual.Libraries.AutoMapper
         {
             CreateMap<Produto, ProdutoItem>();
             CreateMap<Cliente, EnderecoEntrega>()
-                .ForMember(dest=>dest.Id, opt=>opt.MapFrom(orig=>0))
-                .ForMember(dest=>dest.Nome, opt=>opt.MapFrom(orig=>string.Format("Endereço do cliente ({0})", orig.Nome)));
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(orig => 0))
+                .ForMember(dest => dest.Nome, opt => opt.MapFrom(orig => string.Format("Endereço do cliente ({0})", orig.Nome)));
+
+            CreateMap<Transaction, TransacaoPagarMe>();
+
+            CreateMap <TransacaoPagarMe, Pedido>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(orig => 0))
+                .ForMember(dest => dest.ClienteId, opt => opt.MapFrom(orig => int.Parse(orig.Customer.ExternalId)))
+                .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(orig => orig.Id))
+                .ForMember(dest => dest.FreteEmpresa, opt => opt.MapFrom(orig => "ECT - Correios"))
+                .ForMember(dest => dest.FormPagamento, opt => opt.MapFrom(orig => (orig.PaymentMethod == 0) ? MetodoPagamentoConstant.CartaoCredito : MetodoPagamentoConstant.Boleto))
+                .ForMember(dest => dest.DadosTransaction, opt => opt.MapFrom(orig => JsonConvert.SerializeObject(orig)))
+                .ForMember(dest => dest.DataRegistro, opt => opt.MapFrom(orig => DateTime.Now))
+                .ForMember(dest => dest.ValorTotal, opt => opt.MapFrom(orig => Mascara.ConverterPagarMeIntToDecimal(orig.Amount)));
+
+            CreateMap<List<ProdutoItem>, Pedido>()
+                .ForMember(dest => dest.DadosProdutos, opt => opt.MapFrom(orig => JsonConvert.SerializeObject(orig, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() })));
+
+            CreateMap<Pedido, PedidoSituacao>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(orig => 0))
+                .ForMember(dest => dest.PedidoId, opt => opt.MapFrom(orig => orig.Id))
+                .ForMember(dest => dest.Data, opt => opt.MapFrom(orig => DateTime.Now));
+
+            CreateMap<TransactionProduto, PedidoSituacao>()
+                .ForMember(dest => dest.Dados, opt => opt.MapFrom(orig => JsonConvert.SerializeObject(orig, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() })));
+
         }
     }
 }
