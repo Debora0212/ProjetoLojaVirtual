@@ -23,6 +23,8 @@ using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Controllers
 {
+    [ClienteAutorizacao]
+    [ValidateCookiePagamentoController]
     public class PagamentoController : BaseController
     {
         private Cookie _cookie;
@@ -52,76 +54,43 @@ namespace ProjetoLojaVirtual.Controllers
             _cookie = cookie;
             _gerenciarPagarMe = gerenciarPagarMe;
         }
-
-        [ClienteAutorizacao]
+       
         [HttpGet]
         public IActionResult Index()
         {
-            var tipoFreteSelecionadoPeloUsuario = _cookie.Consultar("Carrinho.TipoFrete", false);
-            if (tipoFreteSelecionadoPeloUsuario != null)
-            {
-                var enderecoEntrega = ObterEndereco();
-                var carrinhoHash = GerarHash(_cookieCarrinhoCompra.Consultar());
-                int cep = int.Parse(Mascara.Remover(enderecoEntrega.CEP));
-                List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
-                var frete = ObterFrete(cep.ToString());
+            List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
+            ValorPrazoFrete frete = ObterFrete();
 
-                var total = ObterValorTotalCompra(produtoItemCompleto, frete);
-                var parcelamento = _gerenciarPagarMe.CalcularPagamentoParcelado(total);
+            ViewBag.Frete = frete;
+            ViewBag.Produtos = produtoItemCompleto;
+            ViewBag.Parcelamentos = CalcularParcelamento(produtoItemCompleto);
 
-                ViewBag.Frete = frete;
-                ViewBag.Produtos = produtoItemCompleto;
-                ViewBag.Parcelamentos = parcelamento.Select(a => new SelectListItem(
-                    String.Format(
-                        "{0}x {1} {2} - TOTAL: {3}",
-                        a.Numero, a.ValorPorParcela.ToString("C"), (a.Juros) ? "c/ juros" : "s/ juros", a.Valor.ToString("C")
-                    ),
-                    a.Numero.ToString()
-                )).ToList();
-
-                return View("Index");
-            }
-            TempData["MSG_E"] = Mensagem.MSG_E009;
-            return RedirectToAction("EnderecoEntrega", "CarrinhoCompra");
+            return View("Index");
         }
 
         [HttpPost]
-        [ClienteAutorizacao]
         public IActionResult Index([FromForm]IndexViewModel indexViewModel)
         {
             if (ModelState.IsValid)
             {
-                //TODO - Integrar com Pagar.me, Salvar o pedido (Class), Redirecionar para a tela de pedido concluido;
+                //TODO - Salvar o pedido (Class), Redirecionar para a tela de pedido concluido;
                 EnderecoEntrega enderecoEntrega = ObterEndereco();
-                ValorPrazoFrete frete = ObterFrete(enderecoEntrega.CEP.ToString());
+                ValorPrazoFrete frete = ObterFrete();
                 List<ProdutoItem> produtos = CarregarProdutoDB();
-                var parcela = _gerenciarPagarMe.CalcularPagamentoParcelado(ObterValorTotalCompra(produtos, frete)).Where(a => a.Numero == indexViewModel.Parcelamento.Numero).First();
+                Parcelamento parcela = BuscarParcelamento(produtos, indexViewModel.Parcelamento.Numero);
 
                 try
                 {
-                    dynamic pagarmeResposta = _gerenciarPagarMe.GerarPagCartaoCredito(indexViewModel.CartaoCredito, enderecoEntrega, frete, produtos);
+                    Transaction transaction = _gerenciarPagarMe.GerarPagCartaoCredito(indexViewModel.CartaoCredito, parcela, enderecoEntrega, frete, produtos);
 
-                    return new ContentResult() { Content = "Sucesso! " + pagarmeResposta.TransactionId };
+                    return new ContentResult() { Content = "Sucesso! Cartão de Crédito" + transaction.Id };
                 }
                 catch (PagarMeException e)
                 {
-                    StringBuilder sb = new StringBuilder();
-
-                    if (e.Error.Errors.Count() > 0)
-                    {
-                        sb.Append("Erro no pagamento: ");
-                        foreach (var erro in e.Error.Errors)
-                        {
-                            sb.Append("- " + erro.Message + "<br />");
-                        }
-                    }
-                    TempData["MSG_E"] = sb.ToString();
+                    TempData["MSG_E"] = MontarMensagensDeErro(e);
 
                     return Index();
                 }
-
-
-
             }
             else
             {
@@ -130,7 +99,39 @@ namespace ProjetoLojaVirtual.Controllers
 
         }
 
+        public IActionResult BoletoBancario()
+        {
+            EnderecoEntrega enderecoEntrega = ObterEndereco();
+            ValorPrazoFrete frete = ObterFrete();
+            List<ProdutoItem> produtos = CarregarProdutoDB();
+            var valorTotal = ObterValorTotalCompra(produtos);
 
+            try
+            {
+                Transaction transaction = _gerenciarPagarMe.GerarBoleto(valorTotal);
+
+                //TODO - Redirecionar para Página de Sucesso!
+                return new ContentResult() { Content = "Sucesso! Boleto - " + transaction.Id };
+
+            }
+            catch (PagarMeException e)
+            {
+                TempData["MSG_E"] = MontarMensagensDeErro(e);
+                return RedirectToAction(nameof(Index));
+            }
+        }
+
+
+
+
+
+
+
+
+        private Parcelamento BuscarParcelamento(List<ProdutoItem> produtos, int numero)
+        {
+            return _gerenciarPagarMe.CalcularPagamentoParcelado(ObterValorTotalCompra(produtos)).Where(a => a.Numero == numero).First();
+        }
         private EnderecoEntrega ObterEndereco()
         {
             EnderecoEntrega enderecoEntrega = null;
@@ -139,29 +140,22 @@ namespace ProjetoLojaVirtual.Controllers
             if (enderecoEntregaId == 0)
             {
                 Cliente cliente = _loginCliente.GetCliente();
-                enderecoEntrega = new EnderecoEntrega();
-                enderecoEntrega.Nome = "Endereço do cliente";
-                enderecoEntrega.Id = 0;
-                enderecoEntrega.CEP = cliente.CEP;
-                enderecoEntrega.Estado = cliente.Estado;
-                enderecoEntrega.Cidade = cliente.Cidade;
-                enderecoEntrega.Bairro = cliente.Bairro;
-                enderecoEntrega.Endereco = cliente.Endereco;
-                enderecoEntrega.Complemento = cliente.Complemento;
-                enderecoEntrega.Numero = cliente.Numero;
+                enderecoEntrega = _mapper.Map<EnderecoEntrega>(cliente);
             }
             else
             {
                 var endereco = _enderecoEntregaRepository.ObterEnderecoEntrega(enderecoEntregaId);
+                enderecoEntrega = endereco;
             }
 
             return enderecoEntrega;
         }
-        private ValorPrazoFrete ObterFrete(string cepDestino)
+        private ValorPrazoFrete ObterFrete()
         {
+            var enderecoEntrega = ObterEndereco();
+            int cep = int.Parse(Mascara.Remover(enderecoEntrega.CEP));
             var tipoFreteSelecionadoPeloUsuario = _cookie.Consultar("Carrinho.TipoFrete", false);
             var carrinhoHash = GerarHash(_cookieCarrinhoCompra.Consultar());
-            int cep = int.Parse(Mascara.Remover(cepDestino));
 
             Frete frete = _cookieFrete.Consultar().Where(a => a.CEP == cep && a.CodCarrinho == carrinhoHash).FirstOrDefault();
 
@@ -171,9 +165,9 @@ namespace ProjetoLojaVirtual.Controllers
             }
             return null;
         }
-
-        private decimal ObterValorTotalCompra(List<ProdutoItem> produtos, ValorPrazoFrete frete)
+        private decimal ObterValorTotalCompra(List<ProdutoItem> produtos)
         {
+            ValorPrazoFrete frete = ObterFrete();
             decimal total = Convert.ToDecimal(frete.Valor);
 
             foreach (var produto in produtos)
@@ -182,6 +176,34 @@ namespace ProjetoLojaVirtual.Controllers
             }
 
             return total;
+        }
+        private List<SelectListItem> CalcularParcelamento(List<ProdutoItem> produtos)
+        {
+            var total = ObterValorTotalCompra(produtos);
+            var parcelamento = _gerenciarPagarMe.CalcularPagamentoParcelado(total);
+
+
+            return parcelamento.Select(a => new SelectListItem(
+                String.Format(
+                    "{0}x {1} {2} - TOTAL: {3}",
+                    a.Numero, a.ValorPorParcela.ToString("C"), (a.Juros) ? "c/ juros" : "s/ juros", a.Valor.ToString("C")
+                ),
+                a.Numero.ToString()
+            )).ToList();
+        }
+        private string MontarMensagensDeErro(PagarMeException e)
+        {
+            StringBuilder sb = new StringBuilder();
+
+            if (e.Error.Errors.Count() > 0)
+            {
+                sb.Append("Erro no pagamento: ");
+                foreach (var erro in e.Error.Errors)
+                {
+                    sb.Append("- " + erro.Message + "<br />");
+                }
+            }
+            return sb.ToString();
         }
     }
 }

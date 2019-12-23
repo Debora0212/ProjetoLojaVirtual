@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Models.ViewModels;
+using ProjetoLojaVirtual.Models.ViewModels.Components;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using System;
 using System.Collections.Generic;

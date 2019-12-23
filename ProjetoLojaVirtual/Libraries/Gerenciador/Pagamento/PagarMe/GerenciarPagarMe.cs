@@ -22,53 +22,45 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             _loginCliente = loginCliente;
         }
 
-        public object GerarBoleto(decimal valor)
+        public Transaction GerarBoleto(decimal valor)
         {
-            try
+            Cliente cliente = _loginCliente.GetCliente();
+
+            PagarMeService.DefaultApiKey = _configuration.GetValue<String>("Pagamento:PagarMe:ApiKey");
+            PagarMeService.DefaultEncryptionKey = _configuration.GetValue<String>("Pagamento:PagarMe:EncryptionKey");
+
+            Transaction transaction = new Transaction();
+
+            transaction.Amount = Convert.ToInt32(valor);
+            transaction.PaymentMethod = PaymentMethod.Boleto;
+
+            transaction.Customer = new Customer
             {
-                Cliente cliente = _loginCliente.GetCliente();
-
-                PagarMeService.DefaultApiKey = _configuration.GetValue<String>("Pagamento:PagarMe:ApiKey");
-                PagarMeService.DefaultEncryptionKey = _configuration.GetValue<String>("Pagamento:PagarMe:EncryptionKey");
-
-                Transaction transaction = new Transaction();
-
-                //TODO - Calcular o valor total;
-                transaction.Amount = Convert.ToInt32(valor);
-                transaction.PaymentMethod = PaymentMethod.Boleto;
-
-                transaction.Customer = new Customer
-                {
-                    ExternalId = cliente.Id.ToString(),
-                    Name = cliente.Nome,
-                    Type = CustomerType.Individual,
-                    Country = "br",
-                    Email = cliente.Email,
-                    Documents = new[] {
+                ExternalId = cliente.Id.ToString(),
+                Name = cliente.Nome,
+                Type = CustomerType.Individual,
+                Country = "br",
+                Email = cliente.Email,
+                Documents = new[] {
                         new Document{
                             Type = DocumentType.Cpf,
                             Number = Mascara.Remover(cliente.CPF)
                         }
                     },
-                    PhoneNumbers = new string[]
-                    {
+                PhoneNumbers = new string[]
+                {
                         "+55" + Mascara.Remover( cliente.Telefone )
-                    },
-                    Birthday = cliente.Nascimento.ToString("yyyy-MM-dd")
-                };
+                },
+                Birthday = cliente.Nascimento.ToString("yyyy-MM-dd")
+            };
 
-                transaction.Save();
+            transaction.Save();
 
-                return new { BoletoURL = transaction.BoletoUrl, BarCode = transaction.BoletoBarcode, Expiracao = transaction.BoletoExpirationDate };
-            }
-            catch (Exception e)
-            {
-                return new { Erro = e.Message };
-            }
+            return transaction;
         }
 
 
-        public object GerarPagCartaoCredito(CartaoCredito cartao, EnderecoEntrega enderecoEntrega, ValorPrazoFrete valorFrete, List<ProdutoItem> produtos)
+        public Transaction GerarPagCartaoCredito(CartaoCredito cartao, Parcelamento parcelamento, EnderecoEntrega enderecoEntrega, ValorPrazoFrete valorFrete, List<ProdutoItem> produtos)
         {
             Cliente cliente = _loginCliente.GetCliente();
 
@@ -78,12 +70,18 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             Card card = new Card();
             card.Number = cartao.NumeroCartao;
             card.HolderName = cartao.NomeNoCartao;
-            card.ExpirationDate = cartao.VecimentoMM + cartao.VecimentoYY;
+            card.ExpirationDate = cartao.VencimentoMM + cartao.VencimentoYY;
             card.Cvv = cartao.CodigoSeguranca;
 
             card.Save();
 
             Transaction transaction = new Transaction();
+            /*
+             * TODO - transaction.postbackurl
+             * - Parâmetro importante para que seu site seja informado sobre todas as mudanças de status ocorridas no Pagar.Me.
+             * URL 1: https://pagarme.zendesk.com/hc/pt-br/articles/205973476-Quando-o-POSTback-%C3%A9-enviado-
+             * URL 2: https://docs.pagar.me/v1/reference#criar-transacao
+             */
 
             transaction.Card = new Card
             {
@@ -128,14 +126,13 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             var Today = DateTime.Now;
 
             var fee = Convert.ToDecimal(valorFrete.Valor);
-            decimal valorTotal = fee;
 
             transaction.Shipping = new Shipping
             {
                 Name = enderecoEntrega.Nome,
                 Fee = Mascara.ConverterValorPagarMe(fee),
                 DeliveryDate = Today.AddDays(_configuration.GetValue<int>("Frete:DiasParaPostagem")).AddDays(valorFrete.Prazo).ToString("yyyy-MM-dd"),
-                Expedited = false,  
+                Expedited = false,
                 Address = new Address()
                 {
                     Country = "br",
@@ -163,17 +160,17 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                     UnitPrice = Mascara.ConverterValorPagarMe(item.Valor)
                 };
 
-                valorTotal += (item.Valor * item.QuantidadeProdutoCarrinho);
+
                 itens[i] = itemA;
             }
 
             transaction.Item = itens;
-            transaction.Amount = Mascara.ConverterValorPagarMe(valorTotal);
-
+            transaction.Amount = Mascara.ConverterValorPagarMe(parcelamento.Valor);
+            transaction.Installments = parcelamento.Numero;
 
             transaction.Save();
 
-            return new { TransactionId = transaction.Id };
+            return transaction;
         }
 
 
@@ -183,21 +180,23 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
 
             int maxParcelamento = _configuration.GetValue<int>("Pagamento:PagarMe:MaxParcelas");
             int parcelaPagaVendedor = _configuration.GetValue<int>("Pagamento:PagarMe:ParcelaPagaVendedor");
-            decimal juros = _configuration.GetValue<decimal>("Pagamento:PagarMe:Juros"); 
+            decimal juros = _configuration.GetValue<decimal>("Pagamento:PagarMe:Juros");
 
-            for(int i= 1; i <= maxParcelamento; i++)
+            for (int i = 1; i <= maxParcelamento; i++)
             {
                 Parcelamento parcelamento = new Parcelamento();
                 parcelamento.Numero = i;
 
-                if(i > parcelaPagaVendedor)
+                if (i > parcelaPagaVendedor)
                 {
+                    //Juros - i = (4-3 - parcelaPagaVendedor) + 5%
                     int quantidadeParcelasComJuros = i - parcelaPagaVendedor;
                     decimal valorDoJuros = valor * juros / 100;
 
                     parcelamento.Valor = quantidadeParcelasComJuros * valorDoJuros + valor;
                     parcelamento.ValorPorParcela = parcelamento.Valor / parcelamento.Numero;
                     parcelamento.Juros = true;
+
                 }
                 else
                 {
@@ -208,8 +207,9 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                 lista.Add(parcelamento);
             }
 
+            return lista;
         }
 
     }
-}
 
+}
