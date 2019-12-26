@@ -41,7 +41,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 
                 if (returnUrl == null)
                 {
-                    return new RedirectResult(Url.Action(nameof(Painel)));
+                    return RedirectToAction("Index", "Home", new { area = "" });
                 }
                 else
                 {
@@ -56,10 +56,11 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
         }
 
         [HttpGet]
-        [ClienteAutorizacao]
-        public IActionResult Painel()
+        public IActionResult Sair()
         {
-            return new ContentResult() { Content = "Este é o Painel do Cliente!" };
+            _loginCliente.Logout();
+
+            return RedirectToAction("Index", "Home", new { area = "" });
         }
 
         [HttpGet]

@@ -48,8 +48,16 @@
             <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Pesquisa</button>
             @if (_loginCliente.GetCliente() != null)
             {
-
-                <a class="nav-link" asp-controller="Home" asp-action="Painel" asp-area="Cliente"><i class="fas fa-user-alt"></i> @_loginCliente.GetCliente().Nome </a>
+                <div class="dropdown">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fas fa-user-alt"></i> @_loginCliente.GetCliente().Nome
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" asp-action="Atualizar" asp-controller="Cliente" asp-area="Cliente" asp-route-id="@_loginCliente.GetCliente().Id">Minha conta</a>
+                        <a class="dropdown-item" asp-action="Index" asp-controller="Pedido" asp-area="Cliente">Meus pedidos</a>
+                        <a class="dropdown-item" asp-action="Sair" asp-controller="Home" asp-area="Cliente">Sair</a>
+                    </div>
+                </div>
             }
             else
             {

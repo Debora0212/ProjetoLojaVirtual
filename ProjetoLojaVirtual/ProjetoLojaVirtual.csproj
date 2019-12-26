@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Areas\Cliente\Controllers\PedidoController.cs" />
+    <Compile Remove="Controllers\EnderecoEntregaController.cs" />
   </ItemGroup>
 
 
