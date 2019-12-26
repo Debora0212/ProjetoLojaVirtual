@@ -65,5 +65,31 @@ namespace ProjetoLojaVirtual.Libraries.Email
             //Enviar mensagem via SMTP
             _smtp.Send(mensagem);
         }
+
+        public void EnviarDadosDoPedido(Cliente cliente, Pedido pedido)
+        {
+            string corpoMsg = string.Format("<h2>Pedido - LojaVirtual</h2>" +
+
+                "Pedido realizado com sucesso!<br />" +
+                "<h3>Nº {0}</h3>" +
+                "<br /> Faça o login em nossa loja virtual e acompanhe o andamento.",
+                pedido.Id + "-" + pedido.TransactionId
+
+            );
+
+
+            /*
+             * MailMessage -> Construir a mensagem
+             */
+            MailMessage mensagem = new MailMessage();
+            mensagem.From = new MailAddress(_configuration.GetValue<string>("Email:Username"));
+            mensagem.To.Add(cliente.Email);
+            mensagem.Subject = "LojaVirtual - Pedido - " + pedido.Id + "-" + pedido.TransactionId;
+            mensagem.Body = corpoMsg;
+            mensagem.IsBodyHtml = true;
+
+            //Enviar Mensagem via SMTP
+            _smtp.Send(mensagem);
+        }
     }
 }

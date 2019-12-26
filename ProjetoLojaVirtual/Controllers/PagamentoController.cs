@@ -11,6 +11,7 @@ using PagarMe;
 using ProjetoLojaVirtual.Controllers.Base;
 using ProjetoLojaVirtual.Libraries.CarrinhoCompra;
 using ProjetoLojaVirtual.Libraries.Cookie;
+using ProjetoLojaVirtual.Libraries.Email;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe;
@@ -34,8 +35,10 @@ namespace ProjetoLojaVirtual.Controllers
         private GerenciarPagarMe _gerenciarPagarMe;
         private IPedidoRepository _pedidoRepository;
         private IPedidoSituacaoRepository _pedidoSituacaoRepository;
+        private GerenciarEmail _gerenciarEmail;
 
         public PagamentoController(
+            GerenciarEmail gerenciarEmail,
             GerenciarPagarMe gerenciarPagarMe,
             LoginCliente loginCliente,
             Cookie cookie,
@@ -58,7 +61,8 @@ namespace ProjetoLojaVirtual.Controllers
                   wscorreios,
                   calcularPacote,
                   cookieValorPrazoFrete)
-        {       
+        {
+            _gerenciarEmail = gerenciarEmail;
             _pedidoRepository = pedidoRepository;
             _pedidoSituacaoRepository = pedidoSituacaoRepository;
             _cookie = cookie;     
@@ -91,9 +95,8 @@ namespace ProjetoLojaVirtual.Controllers
                 try
                 {
                     Transaction transaction = _gerenciarPagarMe.GerarPagCartaoCredito(indexViewModel.CartaoCredito, parcela, enderecoEntrega, frete, produtos);
-                    Pedido pedido = SalvarPedido(produtos, transaction);
+                    Pedido pedido = ProcessarPedido(produtos, transaction);
 
-                    //TODO - Remover o estoque dos produtos.
                     return new RedirectToActionResult("Index", "Pedido", new { id = pedido.Id });
                 }
                 catch (PagarMeException e)
@@ -109,7 +112,6 @@ namespace ProjetoLojaVirtual.Controllers
             }
 
         }
-
         public IActionResult BoletoBancario()
         {
             EnderecoEntrega enderecoEntrega = ObterEndereco();
@@ -119,13 +121,11 @@ namespace ProjetoLojaVirtual.Controllers
 
             try
             {
-                Transaction transaction = _gerenciarPagarMe.GerarBoleto(valorTotal);
+                Transaction transaction = _gerenciarPagarMe.GerarBoleto(valorTotal, produtos, enderecoEntrega, frete);
 
-                Pedido pedido = SalvarPedido(produtos, transaction);
+                Pedido pedido = ProcessarPedido(produtos, transaction);
 
-                //TODO - Remover o estoque dos produtos.
-                return new RedirectToActionResult("Index", "Pedido", new { id = pedido.Id});
-
+                return new RedirectToActionResult("Index", "Pedido", new { id = pedido.Id });
             }
             catch (PagarMeException e)
             {
@@ -134,22 +134,37 @@ namespace ProjetoLojaVirtual.Controllers
             }
         }
 
-
-
-
-
-
-        private Pedido SalvarPedido(List<ProdutoItem> produtos, Transaction transaction)
+        private Pedido ProcessarPedido(List<ProdutoItem> produtos, Transaction transaction)
         {
-            TransacaoPagarMe transacaoPagarMe = _mapper.Map<TransacaoPagarMe>(transaction);
+            TransacaoPagarMe transacaoPagarMe;
+            Pedido pedido;
 
-            Pedido pedido = _mapper.Map<TransacaoPagarMe, Pedido>(transacaoPagarMe);
-            pedido = _mapper.Map<List<ProdutoItem>, Pedido>(produtos, pedido);
+            SalvarPedido(produtos, transaction, out transacaoPagarMe, out pedido);
 
-            pedido.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
+            SalvarPedidoSituacao(produtos, transacaoPagarMe, pedido);
 
-            _pedidoRepository.Cadastrar(pedido);
+            DarBaixaNoEstoque(produtos);
 
+            _cookieCarrinhoCompra.RemoverTodos();
+
+           _gerenciarEmail.EnviarDadosDoPedido(_loginCliente.GetCliente(), pedido);
+
+            return pedido;
+        }
+
+        private void DarBaixaNoEstoque(List<ProdutoItem> produtos)
+        {
+            foreach (var produto in produtos)
+            {
+                Produto produtoDB = _produtoRepository.ObterProduto(produto.Id);
+                produtoDB.Quantidade -= produto.QuantidadeProdutoCarrinho;
+
+                _produtoRepository.Atualizar(produtoDB);
+            }
+        }
+
+        private void SalvarPedidoSituacao(List<ProdutoItem> produtos, TransacaoPagarMe transacaoPagarMe, Pedido pedido)
+        {
             TransactionProduto tp = new TransactionProduto { Transaction = transacaoPagarMe, Produtos = produtos };
             PedidoSituacao pedidoSituacao = _mapper.Map<Pedido, PedidoSituacao>(pedido);
             pedidoSituacao = _mapper.Map<TransactionProduto, PedidoSituacao>(tp, pedidoSituacao);
@@ -157,7 +172,17 @@ namespace ProjetoLojaVirtual.Controllers
             pedidoSituacao.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
 
             _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
-            return pedido;
+        }
+
+        private void SalvarPedido(List<ProdutoItem> produtos, Transaction transaction, out TransacaoPagarMe transacaoPagarMe, out Pedido pedido)
+        {
+            transacaoPagarMe = _mapper.Map<TransacaoPagarMe>(transaction);
+            pedido = _mapper.Map<TransacaoPagarMe, Pedido>(transacaoPagarMe);
+            pedido = _mapper.Map<List<ProdutoItem>, Pedido>(produtos, pedido);
+
+            pedido.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
+
+            _pedidoRepository.Cadastrar(pedido);
         }
 
         private Parcelamento BuscarParcelamento(List<ProdutoItem> produtos, int numero)
@@ -204,7 +229,7 @@ namespace ProjetoLojaVirtual.Controllers
 
             foreach (var produto in produtos)
             {
-                total += produto.Valor;
+                total += produto.Valor * produto.QuantidadeProdutoCarrinho;
             }
 
             return total;

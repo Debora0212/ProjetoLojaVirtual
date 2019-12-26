@@ -138,3 +138,16 @@
     min-height: 70px;
     font-size: 36px;
 }
+.numero-pedido {
+    font-size: 24px;
+    font-weight: bold;
+    border: 1px solid #2b7f1b;
+    color: #2b7f1b;
+    background-color: #c9eac3;
+    border-radius: 5px;
+    width: 250px;
+    padding: 15px 10px;
+    margin: 0 auto;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
