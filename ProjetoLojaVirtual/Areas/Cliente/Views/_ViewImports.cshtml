@@ -1,6 +1,10 @@
 ﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @addTagHelper *, ProjetoLojaVirtual
 @using ProjetoLojaVirtual.Models
+@using ProjetoLojaVirtual.Models.ProdutoAgregador
+@using ProjetoLojaVirtual.Models.ViewModels;
 @using X.PagedList.Mvc.Core; //import this so we get our HTML Helper
 @using X.PagedList; //import this so we can cast our list to IPagedList (only necessary because ViewBag is dynamic)
-@using ProjetoLojaVirtual.Models.ViewModels;
+@using Newtonsoft.Json;
+@using ProjetoLojaVirtual.Libraries.Texto
+@using ProjetoLojaVirtual.Libraries.Json.Resolver;

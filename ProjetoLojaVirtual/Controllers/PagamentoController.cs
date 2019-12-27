@@ -112,6 +112,7 @@ namespace ProjetoLojaVirtual.Controllers
             }
 
         }
+
         public IActionResult BoletoBancario()
         {
             EnderecoEntrega enderecoEntrega = ObterEndereco();

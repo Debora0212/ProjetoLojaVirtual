@@ -3,14 +3,43 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using ProjetoLojaVirtual.Libraries.Login;
+using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 {
+    [Area("Cliente")]
     public class PedidoController : Controller
     {
-        public IActionResult Index()
+        private LoginCliente _loginCliente;
+        private IPedidoRepository _pedidoRepository;
+
+        public PedidoController(LoginCliente loginCliente, IPedidoRepository pedidoRepository)
         {
-            return View();
+            _loginCliente = loginCliente;
+            _pedidoRepository = pedidoRepository;
+        }
+
+        public IActionResult Index(int? pagina)
+        {
+            Models.Cliente cliente = _loginCliente.GetCliente();
+            var pedidos = _pedidoRepository.ObterTodosPedidoCliente(pagina, cliente.Id);
+
+            return View(pedidos);
+        }
+
+        public IActionResult Visualizar(int id)
+        {
+            Models.Cliente cliente = _loginCliente.GetCliente();
+            Pedido pedido = _pedidoRepository.ObterPedido(id);
+
+            if (pedido.ClienteId != cliente.Id)
+            {
+                return new ContentResult() { Content = "Acesso negado." };
+            }
+
+            return View(pedido);
         }
     }
 }

@@ -31,7 +31,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
 
             Transaction transaction = new Transaction();
 
-            transaction.Amount = Convert.ToInt32(valor);
+            transaction.Amount = Mascara.ConverterValorPagarMe(valor);
             transaction.PaymentMethod = PaymentMethod.Boleto;
 
             transaction.Customer = new Customer
