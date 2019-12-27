@@ -170,7 +170,7 @@ namespace ProjetoLojaVirtual.Controllers
             PedidoSituacao pedidoSituacao = _mapper.Map<Pedido, PedidoSituacao>(pedido);
             pedidoSituacao = _mapper.Map<TransactionProduto, PedidoSituacao>(tp, pedidoSituacao);
 
-            pedidoSituacao.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
+            pedidoSituacao.Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO;
 
             _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
         }
@@ -181,7 +181,7 @@ namespace ProjetoLojaVirtual.Controllers
             pedido = _mapper.Map<TransacaoPagarMe, Pedido>(transacaoPagarMe);
             pedido = _mapper.Map<List<ProdutoItem>, Pedido>(produtos, pedido);
 
-            pedido.Situacao = PedidoSituacaoConstant.AGUARDANDO_PAGAMENTO;
+            pedido.Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO;
 
             _pedidoRepository.Cadastrar(pedido);
         }

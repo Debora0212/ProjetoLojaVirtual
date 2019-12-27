@@ -3,6 +3,7 @@
     ViewData["Title"] = "Index";
 }
 
+
 <br />
 <br />
 <div class="container">
@@ -45,4 +46,6 @@
         </div>
     }
     @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina = pagina }))
+
+
 </div>

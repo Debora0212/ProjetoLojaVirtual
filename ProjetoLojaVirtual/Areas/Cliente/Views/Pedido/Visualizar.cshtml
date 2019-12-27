@@ -8,24 +8,28 @@
 <br /><br />
 <div class="container">
     <div class="row">
-        <div class="col-md-12">
-            @foreach (var pedidoSituacao in Model.PedidoSituacoes)
-            {
-            <span>
-                @pedidoSituacao.Situacao 
-                @pedidoSituacao.Data
-            </span>
-            }
+        <div class="col-md-12 text-center">
+            <vc:pedido-situacao pedido="@Model" />
+            <br />
+            <br />
+        </div>
+    </div>
+    <div class="row">
 
+        <div class="col-md-12">
             <h3>Dados pedido</h3>
             <table class="table table-bordered">
                 <tr>
-                    <td><strong>Cliente: </strong>@transacao.Customer.Name</td>
-                    <td><strong>Nascimento: </strong>@aniversario.ToString("dd/MM/yyyy")</td>
+                    <td colspan="2"><strong>Situação do pedido:</strong> @Model.Situacao</td>
+
+                </tr>
+                <tr>
+                    <td><strong>Cliente:</strong> @transacao.Customer.Name</td>
+                    <td><strong>Nascimento:</strong> @aniversario.ToString("dd/MM/yyyy")</td>
                 </tr>
                 <tr>
                     <td><strong>Forma de pagamento: </strong>@Model.FormPagamento</td>
-                    <td><strong>Nota Fiscal Eletrônica</strong>@Model.NFE</td>
+                    <td><strong>Nota Fiscal Eletrônica: </strong>- @Model.NFE</td>
                 </tr>
             </table>
 
@@ -38,19 +42,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td><strong>CEP: </strong>@transacao.Shipping.Address.Zipcode</td>
-                    <td><strong>Estado: </strong>@transacao.Shipping.Address.State</td>
-                    <td><strong>Cidade: </strong>@transacao.Shipping.Address.City</td>
-                    <td><strong>Bairro: </strong>@transacao.Shipping.Address.Neighborhood</td>
+                    <td><strong>CEP:</strong> @transacao.Shipping.Address.Zipcode</td>
+                    <td><strong>Estado:</strong> @transacao.Shipping.Address.State</td>
+                    <td><strong>Cidade:</strong> @transacao.Shipping.Address.City</td>
+                    <td><strong>Bairro:</strong> @transacao.Shipping.Address.Neighborhood</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><strong>Endereço: </strong>@transacao.Shipping.Address.Street</td>
+                    <td colspan="2"><strong>Endereço: </strong> @transacao.Shipping.Address.Street</td>
                     <td><strong>Complemento: </strong>@transacao.Shipping.Address.Complementary</td>
                     <td><strong>Número: </strong>@transacao.Shipping.Address.StreetNumber</td>
                 </tr>
                 <tr>
-                    <td colspan="2"><strong>Transportadora: </strong>@Model.FreteEmpresa</td>
-                    <td><strong>Valor do frete: </strong>@Mascara.ConverterPagarMeIntToDecimal(transacao.Shipping.Fee).ToString("C")</td>
+                    <td colspan="2"><strong>Transportadora:</strong> @Model.FreteEmpresa</td>
+                    <td><strong>Valor do frete:</strong> @Mascara.ConverterPagarMeIntToDecimal(transacao.Shipping.Fee).ToString("C")</td>
                     <td><strong>Rastreamento: </strong> - @Model.FreteCodRastreamento</td>
                 </tr>
             </table>
@@ -83,7 +87,10 @@
                     <td>@Model.ValorTotal.ToString("C")</td>
                 </tr>
             </table>
+
+            <br />
+            <br />
+            <button class="btn btn-outline-primary btn-lg btn-imprimir">Imprimir</button>
         </div>
     </div>
 </div>
-

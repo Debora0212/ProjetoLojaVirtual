@@ -10,7 +10,14 @@
     AJAXCalcularFrete(false);
 
     AJAXEnderecoEntregaCalcularFrete();
+
+    PedidoBtImprimir();
 });
+function PedidoBtImprimir(){
+    $(".btn-imprimir").click(function () {
+        windown.print();
+    });
+};
 function AJAXEnderecoEntregaCalcularFrete() {
     $("input[name=endereco]").change(function () {
 
