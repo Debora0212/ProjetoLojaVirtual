@@ -62,63 +62,6 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 
             return RedirectToAction("Index", "Home", new { area = "" });
         }
-
-        [HttpGet]
-        public IActionResult CadastroCliente()
-        {
-            return View();
-        }
-        [HttpPost]
-        public IActionResult CadastroCliente([FromForm]Models.Cliente cliente, string returnUrl = null)
-        {
-            if (ModelState.IsValid)
-            {
-                _repositoryCliente.Cadastrar(cliente);
-                _loginCliente.Login(cliente);
-
-                TempData["MSG_S"] = "Cadastro realizado com sucesso!";
-
-                if (returnUrl == null)
-                {
-                    return RedirectToAction("Index", "Home", new { area = "" });
-                }
-                else
-                {
-                    return LocalRedirectPermanent(returnUrl);
-                }
-            }
-            return View();
-        }
-
-
-        [HttpGet]
-        public IActionResult CadastroEnderecoEntrega()
-        {
-            //TODO - Melhorar o HTML do campo Nome.
-            //TODO - Remover do JS a opção de Carregar o CEP quando ele está no cookie para esta tela.
-            return View();
-        }
-
-        [HttpPost]
-        public IActionResult CadastroEnderecoEntrega([FromForm]EnderecoEntrega enderecoentrega, string returnUrl = null)
-        {
-            if (ModelState.IsValid)
-            {
-                enderecoentrega.ClienteId = _loginCliente.GetCliente().Id;
-
-                _repositoryEnderecoEntrega.Cadastrar(enderecoentrega);
-
-                if (returnUrl == null)
-                {
-                    //TODO - Listagem de endereços.
-                }
-                else
-                {
-                    return LocalRedirectPermanent(returnUrl);
-                }
-            }
-            return View();
-        }
-
+        
     }
 }

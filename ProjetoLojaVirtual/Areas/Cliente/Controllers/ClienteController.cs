@@ -7,22 +7,52 @@ using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Repositories;
+using ProjetoLojaVirtual.Repositories.Contracts;
 
 namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 {
+    [Area("Cliente")]
     public class ClienteController : Controller
     {
         private LoginCliente _loginCliente;
-        private ClienteRepository _clienteRepository;
+        private IClienteRepository _clienteRepository;
 
-        public ClienteController(LoginCliente loginCliente, ClienteRepository clienteRepository)
+        public ClienteController(LoginCliente loginCliente, IClienteRepository clienteRepository)
         {
             _loginCliente = loginCliente;
             _clienteRepository = clienteRepository;
         }
+
         [ClienteAutorizacao]
         public IActionResult Index()
         {
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult Cadastrar()
+        {
+            return View();
+        }
+        [HttpPost]
+        public IActionResult Cadastrar([FromForm]Models.Cliente cliente, string returnUrl = null)
+        {
+            if (ModelState.IsValid)
+            {
+                _clienteRepository.Cadastrar(cliente);
+                _loginCliente.Login(cliente);
+
+                TempData["MSG_S"] = "Cadastro realizado com sucesso!";
+
+                if (returnUrl == null)
+                {
+                    return RedirectToAction("Index", "Home", new { area = "" });
+                }
+                else
+                {
+                    return LocalRedirectPermanent(returnUrl);
+                }
+            }
             return View();
         }
 
@@ -57,6 +87,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
             return View();
         }
 
+
         [ClienteAutorizacao]
         [HttpGet]
         public IActionResult AtualizarSenha()
@@ -66,7 +97,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 
         [ClienteAutorizacao]
         [HttpPost]
-        public IActionResult AtualizaSenhar(Models.Cliente cliente)
+        public IActionResult AtualizarSenha(Models.Cliente cliente)
         {
             ModelState.Remove("Nome");
             ModelState.Remove("Nascimento");
@@ -80,7 +111,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
             ModelState.Remove("Bairro");
             ModelState.Remove("Endereco");
             ModelState.Remove("Complemento");
-            ModelState.Remove("Numero");         
+            ModelState.Remove("Numero");
 
             if (ModelState.IsValid)
             {
@@ -93,9 +124,9 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
                 TempData["MSG_S"] = Mensagem.MSG_S001;
 
                 return RedirectToAction(nameof(Index));
-
             }
             return View();
         }
+
     }
 }

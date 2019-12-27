@@ -1,7 +1,6 @@
 ﻿@model ProjetoLojaVirtual.Models.Cliente
 @{
     ViewData["Title"] = "CadastroCliente";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <form method="post">
     <main role="main">
@@ -65,7 +64,7 @@
 
                                 <div class="form-group">
                                     <label asp-for="CEP">CEP</label>
-                                    <input type="text" asp-for="CEP" class="cep form-control" placeholder="">
+                                    <input type="text" asp-for="CEP" class="no-cep cep form-control" placeholder="">
                                     <span asp-validation-for="CEP"></span>
                                     <div class="alert alert-danger" style="display:none;"></div>
                                 </div>

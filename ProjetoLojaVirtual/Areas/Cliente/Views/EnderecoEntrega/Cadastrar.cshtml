@@ -1,6 +1,6 @@
-﻿@model ProjetoLojaVirtual.Models.Cliente
+﻿@model EnderecoEntrega
 @{
-    ViewData["Title"] = "CadastroCliente";
+    ViewData["Title"] = "Cadastro de endereço";
 }
 <form method="post">
     <main role="main">
@@ -9,59 +9,21 @@
             <div class="row">
                 <aside class="col-sm-6">
                     <h3 class="subtitle-doc">
-                        Atualizar
+                        Cadastro endereço
                     </h3>
                     <div id="code_register_1">
                         <div class="card">
-                            <input type="hidden" asp-for="Id" />
                             <header class="card-header">
-                                <h4 class="card-title mt-2">Atualizar</h4>
+                                <h4 class="card-title mt-2">Cadastro</h4>
                             </header>
                             <article class="card-body">
                                 @{ await Html.RenderPartialAsync("~/Views/Shared/_Mensagem.cshtml"); }
-                                <div class="form-row">
-                                    <div class="col form-group">
-                                        <label asp-for="Nome">Nome</label>
-                                        <input type="text" asp-for="Nome" class="form-control" placeholder="">
-                                        <span asp-validation-for="Nome"></span>
-                                    </div>
-                                    <div class="col form-group">
-                                        <label asp-for="Nascimento">Nascimento</label>
-                                        <input type="text" asp-for="Nascimento" class="form-control" placeholder="">
-                                        <span asp-validation-for="Nascimento"></span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" asp-for="Sexo" value="M">
-                                        <span class="form-check-label"> Masculino </span>
-                                    </label>
-                                    <label class="form-check form-check-inline">
-                                        <input class="form-check-input" type="radio" asp-for="Sexo" value="F">
-                                        <span class="form-check-label"> Feminino</span>
-                                    </label>
-                                    <span asp-validation-for="Sexo"></span>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="CPF">CPF</label>
-                                    <input type="text" asp-for="CPF" class="form-control" placeholder="">
-                                    <span asp-validation-for="CPF"></span>
-                                </div>
-                                <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                        <label asp-for="Telefone">Telefone</label>
-                                        <input type="text" asp-for="Telefone" class="form-control">
-                                        <span asp-validation-for="Telefone"></span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label asp-for="Email">E-mail</label>
-                                    <input type="text" asp-for="Email" class="form-control" placeholder="">
-                                    <span asp-validation-for="Email"></span>
-                                </div>
 
-
-
+                                <div class="form-group">
+                                    <label asp-for="Nome">Nome do endereço</label>
+                                    <input type="text" asp-for="Nome" class="form-control" placeholder="">
+                                    <span asp-validation-for="Nome"></span>
+                                </div>
                                 <div class="form-group">
                                     <label asp-for="CEP">CEP</label>
                                     <input type="text" asp-for="CEP" class="no-cep cep form-control" placeholder="">

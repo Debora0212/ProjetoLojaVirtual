@@ -99,10 +99,7 @@ namespace ProjetoLojaVirtual
              * Session configuration
              */
             services.AddMemoryCache(); //Guardar os dados na memória
-            services.AddSession(Options =>
-            {
-                Options.Cookie.IsEssential = true;
-            });
+           
 
             services.AddScoped<Sessao>();
             services.AddScoped<ProjetoLojaVirtual.Libraries.Cookie.Cookie>();
@@ -112,7 +109,14 @@ namespace ProjetoLojaVirtual
 
             services.AddMvc(options=>{
                 options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(x => "O campo deve ser preenchido!");
-            }).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
+            })
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
+            .AddSessionStateTempDataProvider();
+
+            services.AddSession(Options =>
+            {
+                Options.Cookie.IsEssential = true;
+            });
 
             string connection = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=LojaVirtual;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 

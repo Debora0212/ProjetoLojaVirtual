@@ -1,7 +1,6 @@
 ﻿@model ProjetoLojaVirtual.Models.Cliente
 @{
     ViewData["Title"] = "Login";
-    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <main role="main">
     <br />
@@ -16,7 +15,7 @@
                     <article class="card-body">
                         @{ await Html.RenderPartialAsync("~/Views/Shared/_Mensagem.cshtml"); }
 
-                        <a asp-action="CadastroCliente" asp-controller="Home" asp-route-returnUrl="@Context.Request.Query["returnUrl"]" class="float-right btn btn-outline-primary">Cadastre-se</a>
+                        <a asp-action="Cadastrar" asp-controller="Cliente" asp-route-returnUrl="@Context.Request.Query["returnUrl"]" class="float-right btn btn-outline-primary">Cadastre-se</a>
                         <h4 class="card-title mb-4 mt-1">Entrar</h4>
                         <form method="post">
                             <div class="form-group">
