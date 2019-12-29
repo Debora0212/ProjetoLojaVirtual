@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using ProjetoLojaVirtual.Database;
 using ProjetoLojaVirtual.Libraries.Texto;
 using ProjetoLojaVirtual.Models;
+using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -71,6 +72,11 @@ namespace ProjetoLojaVirtual.Repositories
             int NumeroPagina = pagina ?? 1;
 
             return _banco.Pedidos.Include(a => a.PedidoSituacoes).ToPagedList<Pedido>(NumeroPagina, RegistroPorPagina);
+        }
+
+        public List<Pedido> ObterTodosPedidosRealizados()
+        {
+            return _banco.Pedidos.Include(a => a.PedidoSituacoes).Include(a => a.Cliente).Where(a => a.Situacao == PedidoSituacaoConstant.PEDIDO_REALIZADO).ToList();
         }
     }
 }

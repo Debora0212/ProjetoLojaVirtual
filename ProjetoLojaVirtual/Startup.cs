@@ -26,6 +26,8 @@ using ProjetoLojaVirtual.Libraries.AutoMapper;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Frete;
 using WSCorreios;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe;
+using Coravel;
+using ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable;
 
 namespace ProjetoLojaVirtual
 {
@@ -121,6 +123,10 @@ namespace ProjetoLojaVirtual
             string connection = "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=LojaVirtual;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
 
             services.AddDbContext<LojaVirtualContext>(Options => Options.UseSqlServer(connection));
+
+
+            services.AddTransient<PedidoPagamentoSituacaoJob>();
+            services.AddScheduler();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -154,6 +160,14 @@ namespace ProjetoLojaVirtual
                     template: "/{controller=Home}/{action=Index}/{id?}");
             });
 
+            /*
+             * Scheduler - Coravel.
+             */
+
+            app.ApplicationServices.UseScheduler(scheduler =>
+            {
+                scheduler.Schedule<PedidoPagamentoSituacaoJob>().EveryTenSeconds();   
+            });
         }
     }
 }
