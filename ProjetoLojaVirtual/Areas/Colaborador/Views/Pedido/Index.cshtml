@@ -1,12 +1,25 @@
 ﻿@model IPagedList<Pedido>
 @{
     ViewData["Title"] = "Index";
+    var codigoPedido = Context.Request.Query["codigoPedido"];
+    var cpf = Context.Request.Query["cpf"];
 }
-
 
 <br />
 <br />
 <div class="container">
+
+    <form method="get" class="form-inline">
+
+        <label for="numeroPedido">Nº pedido</label>
+        <input type="text" name="codigoPedido" class="form-control" value="@codigoPedido" id="numeroPedido">
+
+        <label for="cpf">CPF</label>
+        <input type="text" name="cpf" class="form-control" value="@cpf" id="cpf">
+
+        <button type="submit" class="btn btn-primary">Pesquisar</button>
+    </form>
+
 
     @{ await Html.RenderPartialAsync("~/Views/Shared/_Mensagem.cshtml"); }
 
@@ -17,6 +30,7 @@
                 <thead>
                     <tr>
                         <th scope="col">Nº Pedido</th>
+                        <th scope="col">Cliente</th>
                         <th scope="col">Data da compra</th>
                         <th scope="col">Valor</th>
                         <th scope="col">Forma de pagamento</th>
@@ -30,6 +44,7 @@
                     {
                         <tr>
                             <td>@pedido.Id-@pedido.TransactionId</td>
+                            <td>@pedido.Cliente.Nome - @pedido.Cliente.CPF</td>
                             <td>@pedido.DataRegistro.ToString("dd/MM/yyyy")</td>
                             <td>@pedido.ValorTotal.ToString("C")</td>
                             <td>@pedido.FormPagamento</td>
@@ -45,7 +60,8 @@
             </table>
         </div>
     }
-    @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina = pagina }))
+
+    @Html.PagedListPager((IPagedList)Model, pagina => Url.Action("Index", new { pagina = pagina, codigoPedido = codigoPedido, cpf = cpf }))
 
 
 </div>
