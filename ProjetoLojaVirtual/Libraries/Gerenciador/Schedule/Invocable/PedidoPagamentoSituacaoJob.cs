@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using Coravel.Invocable;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using PagarMe;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe;
+using ProjetoLojaVirtual.Libraries.Json.Resolver;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Models.Constants;
+using ProjetoLojaVirtual.Models.ProdutoAgregador;
 using ProjetoLojaVirtual.Repositories.Contracts;
 using System;
 using System.Collections.Generic;
@@ -20,13 +23,17 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
         private IPedidoRepository _pedidoRepository;
         private IPedidoSituacaoRepository _pedidoSituacaoRepository;
         private IMapper _mapper;
+        private IConfiguration _configuration;
+        private IProdutoRepository _produtoRepository;
 
-        public PedidoPagamentoSituacaoJob(GerenciarPagarMe gerenciarPagarMe, IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, IMapper mapper)
+        public PedidoPagamentoSituacaoJob(GerenciarPagarMe gerenciarPagarMe, IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, IMapper mapper, IConfiguration configuration, IProdutoRepository produtoRepository)
         {
             _gerenciarPagarMe = gerenciarPagarMe;
             _pedidoRepository = pedidoRepository;
             _mapper = mapper;
             _pedidoSituacaoRepository = pedidoSituacaoRepository;
+            _configuration = configuration;
+            _produtoRepository = produtoRepository;
         }
 
         public Task Invoke()
@@ -37,25 +44,28 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
                 string situacao = null;
                 var transaction = _gerenciarPagarMe.ObterTransacao(pedido.TransactionId);
 
-                //TODO - Limitar Vencimento Boleto para 2 Dias úteis.
-
-                //TODO - Após 7 dias o boleto não foi pago, rejeitar a transação.
-
-                //TODO - Colocar 7 dias no arquivo de configuração....
-                if (transaction.Status == TransactionStatus.WaitingPayment && transaction.PaymentMethod == PaymentMethod.Boleto && DateTime.Now > pedido.DataRegistro.AddDays(5))
+                int toleranciaDias = _configuration.GetValue<int>("Pagamento:PagarMe:BoletoDiaExpiracao") + _configuration.GetValue<int>("Pagamento:PagarMe:BoletoDiaToleranciaVencido");
+                if (transaction.Status == TransactionStatus.WaitingPayment && transaction.PaymentMethod == PaymentMethod.Boleto && DateTime.Now > pedido.DataRegistro.AddDays(toleranciaDias))
                 {
                     situacao = PedidoSituacaoConstant.PAGAMENTO_NAO_REALIZADO;
+                    DevolverProdutosEstoque(pedido);
                 }
 
                 if (transaction.Status == TransactionStatus.Refused)
                 {
                     situacao = PedidoSituacaoConstant.PAGAMENTO_REJEITADO;
-                    //TODO - Retornar para o estoque os produtos desse carrinho.
+                    DevolverProdutosEstoque(pedido);
                 }
 
                 if (transaction.Status == TransactionStatus.Authorized || transaction.Status == TransactionStatus.Paid)
                 {
                     situacao = PedidoSituacaoConstant.PAGAMENTO_APROVADO;
+                }
+
+                if (transaction.Status == TransactionStatus.Refunded)
+                {
+                    situacao = PedidoSituacaoConstant.ESTORNO;
+                    DevolverProdutosEstoque(pedido);
                 }
 
                 if (situacao != null)
@@ -77,8 +87,24 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
             }
 
             Debug.WriteLine("--PedidoPagamentoSituacaoJob - Executado!--");
-
+           
             return Task.CompletedTask;
+        }
+
+        private void DevolverProdutosEstoque(Pedido pedido)
+        {
+            List<ProdutoItem> produtos = JsonConvert.DeserializeObject<List<ProdutoItem>>(pedido.DadosProdutos, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() });
+
+            //TODO - Renomear - Quantidade Produto (QuantidadeEstoque)
+            //TODO - Renomear - QuantidadeProdutoCarrinho (QuantidadeComprada)
+            foreach (var produto in produtos)
+            {
+                Produto produtoDB = _produtoRepository.ObterProduto(produto.Id);
+                produtoDB.Quantidade += produto.QuantidadeProdutoCarrinho;
+
+                _produtoRepository.Atualizar(produtoDB);
+            }
+
         }
     }
 }
