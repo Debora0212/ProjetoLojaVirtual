@@ -74,9 +74,9 @@ namespace ProjetoLojaVirtual.Repositories
             return _banco.Pedidos.Include(a => a.PedidoSituacoes).ToPagedList<Pedido>(NumeroPagina, RegistroPorPagina);
         }
 
-        public List<Pedido> ObterTodosPedidosRealizados()
+        public List<Pedido> ObterTodosPedidosPorSituacao(string status)
         {
-            return _banco.Pedidos.Include(a => a.PedidoSituacoes).Include(a => a.Cliente).Where(a => a.Situacao == PedidoSituacaoConstant.PEDIDO_REALIZADO).ToList();
+            return _banco.Pedidos.Include(a => a.PedidoSituacoes).Include(a => a.Cliente).Where(a => a.Situacao == status).ToList();
         }
     }
 }

@@ -22,6 +22,12 @@
                     Registrar NF-E
                 </button>
             }
+            @if (Model.Situacao == PedidoSituacaoConstant.NF_EMITIDA)
+            {
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#rastreamento">
+                    Registrar Cod. Rastreamento
+                </button>
+            }
         </div>
     </div>
     <div class="row">
@@ -65,7 +71,7 @@
                 <tr>
                     <td colspan="2"><strong>Transportadora:</strong> @Model.FreteEmpresa</td>
                     <td><strong>Valor do frete:</strong> @Mascara.ConverterPagarMeIntToDecimal(transacao.Shipping.Fee).ToString("C")</td>
-                    <td><strong>Rastreamento: </strong> - @Model.FreteCodRastreamento</td>
+                    <td><strong>Rastreamento: </strong>@Html.Raw(Model.FreteCodRastreamento == null ? "-" : "<a href='https://www.linkcorreios.com.br/" + Model.FreteCodRastreamento + "' target='_blank'>" + Model.FreteCodRastreamento + "</a>")</td>
                 </tr>
             </table>
 
@@ -124,6 +130,34 @@
                     <div class="form-group">
                         <label for="control-nfe">Link da NF-e:</label>
                         <input type="url" class="form-control" id="control-nfe" name="nfe_url" placeholder="URL - NF-e">
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal -->
+<form method="post" asp-action="RegistrarRastreamento" asp-route-id="@Model.Id">
+    <div class="modal fade" id="rastreamento" tabindex="-1" role="dialog" aria-labelledby="rastreamento" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Código de rastreamento</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label for="cod_rastreamento">Código:</label>
+                        <input type="text" class="form-control" id="cod_rastreamento" name="cod_rastreamento" placeholder="Código de rastreamento">
                     </div>
 
                 </div>

@@ -126,6 +126,8 @@ namespace ProjetoLojaVirtual
 
 
             services.AddTransient<PedidoPagamentoSituacaoJob>();
+            services.AddTransient<PedidoEntregueJob>();
+            services.AddTransient<PedidoFinalizadoJob>();
             services.AddScheduler();
         }
 
@@ -166,7 +168,10 @@ namespace ProjetoLojaVirtual
 
             app.ApplicationServices.UseScheduler(scheduler =>
             {
-                scheduler.Schedule<PedidoPagamentoSituacaoJob>().EveryTenSeconds();   
+                scheduler.Schedule<PedidoPagamentoSituacaoJob>().EveryTenSeconds();
+                scheduler.Schedule<PedidoEntregueJob>().EveryTenSeconds();
+                scheduler.Schedule<PedidoFinalizadoJob>().EveryTenSeconds();
+
             });
         }
     }

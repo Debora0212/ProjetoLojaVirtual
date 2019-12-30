@@ -235,3 +235,17 @@
         transition: all 200ms ease-in;
     }
 }
+
+.li.complete-red .status {
+    border-top: 2px solid red;
+}
+
+    .li.complete-red .status:before {
+        background-color: red;
+        border: none;
+        transition: all 200ms ease-in;
+    }
+
+    .li.complete-red .status h4 {
+        color: red;
+    }
