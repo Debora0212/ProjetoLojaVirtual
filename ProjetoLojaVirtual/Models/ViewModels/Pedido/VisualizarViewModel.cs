@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ProjetoLojaVirtual.Libraries.Lang;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -10,7 +12,11 @@ namespace ProjetoLojaVirtual.Models.ViewModels.Pedido
         public Models.Pedido Pedido  { get; set; }
         public NFE NFE { get; set; }
         public CodigoRastreamento CodigoRastreamento { get; set; }
-        public DadosCancelamento CartaoCredito { get; set; }
-        public DadosCancelamento BoletoBancario { get; set; }
+        public DadosCancelamentoCartao CartaoCredito { get; set; }
+        public DadosCancelamentoBoleto BoletoBancario { get; set; }
+        public DadosDevolucao Devolucao { get; set; }
+
+        [Required(ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E001")]
+        public string DevolucaoMotivoRejeicao { get; set; }
     }
 }

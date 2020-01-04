@@ -11,15 +11,17 @@ namespace ProjetoLojaVirtual.Models.Constants
         public const string PAGAMENTO_APROVADO = "Pagamento aprovado";
         public const string PAGAMENTO_REJEITADO = "Pagamento rejeitado";
         public const string PAGAMENTO_NAO_REALIZADO = "Pagamento não realizado (vencido)";
+
         public const string NF_EMITIDA = "NF Emitida";
         public const string EM_TRANSPORTE = "Em transporte";
         public const string ENTREGUE = "Entregue";
-        public const string FINALIZADO = "Finalizado"; //TODO - Criar Processamento de 7 dias da entrega - finalizar o pedido.
-        public const string EM_CANCELAMENTO = "Em cancelamento"; //TODO - Somente funcionário faz o cancelamento.
-        public const string EM_ANALISE = "Em análise"; //TODO - 2 dias úteis em análise.
-        public const string CANCELAMENTO_ACEITO = "Cancelamento aceito"; //TODO - 2 dias úteis em análise.
-        public const string CANCELAMENTO_REJEITADO = "Cancelamento rejeitado"; //TODO - 2 dias úteis em análise.
-        public const string ESTORNO = "Estorno"; //TODO - Cancelamento aceito.
+        public const string FINALIZADO = "Finalizado";
+        public const string ESTORNO = "Estorno";
+
+        public const string DEVOLVER = "Devolver (Em transporte)";
+        public const string DEVOLVER_ENTREGUE = "Devolver (Entregue)";
+        public const string DEVOLUCAO_ACEITA = "Devolução aceita";
+        public const string DEVOLUCAO_REJEITADA = "Devolução rejeitada";
 
         public static string GetNames(string code)
         {

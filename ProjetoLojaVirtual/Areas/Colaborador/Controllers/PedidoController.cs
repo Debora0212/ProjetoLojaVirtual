@@ -55,6 +55,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             ModelState.Remove("CodigoRastreamento");
             ModelState.Remove("CartaoCredito");
             ModelState.Remove("BoletoBancario");
+            ModelState.Remove("Devolucao");
+            ModelState.Remove("DevolucaoMotivoRejeicao");
 
             if (ModelState.IsValid)
             {
@@ -74,7 +76,13 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 _pedidoRepository.Atualizar(pedido);
             }
-            return RedirectToAction(nameof(Visualizar), new { id = id });
+            else
+            {
+                ViewBag.MODAL_NFE = true;
+            }
+
+            viewModel.Pedido = _pedidoRepository.ObterPedido(id);
+            return View(nameof(Visualizar), viewModel);
         }
         public IActionResult RegistrarRastreamento([FromForm]VisualizarViewModel viewModel, int id)
         {
@@ -82,6 +90,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             ModelState.Remove("NFE");
             ModelState.Remove("CartaoCredito");
             ModelState.Remove("BoletoBancario");
+            ModelState.Remove("Devolucao");
+            ModelState.Remove("DevolucaoMotivoRejeicao");
 
             if (ModelState.IsValid)
             {
@@ -101,7 +111,13 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 _pedidoRepository.Atualizar(pedido);
             }
-            return RedirectToAction(nameof(Visualizar), new { id = id });
+            else
+            {
+                ViewBag.MODAL_RASTREAMENTO = true;
+            }
+
+            viewModel.Pedido = _pedidoRepository.ObterPedido(id);
+            return View(nameof(Visualizar), viewModel);
         }
 
 
@@ -111,6 +127,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             ModelState.Remove("NFE");
             ModelState.Remove("CodigoRastreamento");
             ModelState.Remove("BoletoBancario");
+            ModelState.Remove("Devolucao");
+            ModelState.Remove("DevolucaoMotivoRejeicao");
 
             if (ModelState.IsValid)
             {
@@ -132,8 +150,13 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 DevolverProdutosEstoque(pedido);
             }
+            else
+            {
+                ViewBag.MODAL_CARTAOCREDITO = true;
+            }
 
-            return RedirectToAction(nameof(Visualizar), new { id = id });
+            viewModel.Pedido = _pedidoRepository.ObterPedido(id);
+            return View(nameof(Visualizar), viewModel);
         }
 
 
@@ -143,7 +166,9 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             ModelState.Remove("NFE");
             ModelState.Remove("CartaoCredito");
             ModelState.Remove("CodigoRastreamento");
-    
+            ModelState.Remove("Devolucao");
+            ModelState.Remove("DevolucaoMotivoRejeicao");
+
             if (ModelState.IsValid)
             {
                 viewModel.BoletoBancario.FormPagamento = MetodoPagamentoConstant.Boleto;
@@ -164,9 +189,80 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 DevolverProdutosEstoque(pedido);
             }
+            else
+            {
+                ViewBag.MODAL_BOLETOBANCARIO = true;
+            }
 
-            return RedirectToAction(nameof(Visualizar), new { id = id });
+            viewModel.Pedido = _pedidoRepository.ObterPedido(id);
+            return View(nameof(Visualizar), viewModel);
         }
+
+        public IActionResult RegistrarDevolucaoPedido([FromForm]VisualizarViewModel viewModel, int id)
+        {
+            ModelState.Remove("Pedido");
+            ModelState.Remove("NFE");
+            ModelState.Remove("CartaoCredito");
+            ModelState.Remove("BoletoBancario");
+            ModelState.Remove("CodigoRastreamento");
+            ModelState.Remove("DevolucaoMotivoRejeicao");
+
+            if (ModelState.IsValid)
+            {
+                Pedido pedido = _pedidoRepository.ObterPedido(id);
+                pedido.Situacao = PedidoSituacaoConstant.DEVOLUCAO_REJEITADA;
+
+                var pedidoSituacao = new PedidoSituacao();
+                pedidoSituacao.Data = DateTime.Now;
+                pedidoSituacao.Dados = viewModel.DevolucaoMotivoRejeicao;
+                pedidoSituacao.PedidoId = id;
+                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLUCAO_REJEITADA;
+
+                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                _pedidoRepository.Atualizar(pedido);
+
+            }
+            else
+            {
+                ViewBag.MODAL_DEVOLVER_REJEITAR = true;
+            }
+
+            viewModel.Pedido = _pedidoRepository.ObterPedido(id);
+            return View(nameof(Visualizar), viewModel);
+        }
+
+        public IActionResult RegistrarDevolucaoPedidoRejeicao([FromForm]VisualizarViewModel viewModel, int id)
+        {
+            ModelState.Remove("Pedido");
+            ModelState.Remove("NFE");
+            ModelState.Remove("CartaoCredito");
+            ModelState.Remove("BoletoBancario");
+            ModelState.Remove("CodigoRastreamento");
+
+            if (ModelState.IsValid)
+            {
+                Pedido pedido = _pedidoRepository.ObterPedido(id);
+                pedido.Situacao = PedidoSituacaoConstant.DEVOLVER;
+
+                var pedidoSituacao = new PedidoSituacao();
+                pedidoSituacao.Data = DateTime.Now;
+                pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.Devolucao);
+                pedidoSituacao.PedidoId = id;
+                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLVER;
+
+                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                _pedidoRepository.Atualizar(pedido);
+
+            }
+            else
+            {
+                ViewBag.MODAL_DEVOLVER = true;
+            }
+
+            viewModel.Pedido = _pedidoRepository.ObterPedido(id);
+            return View(nameof(Visualizar), viewModel);
+        }
+
 
         //TODO - Refatorar - Centralizar código DevolverProdutosEstoque(PedidoPagamentoSituacao) com PedidoController
         private void DevolverProdutosEstoque(Pedido pedido)

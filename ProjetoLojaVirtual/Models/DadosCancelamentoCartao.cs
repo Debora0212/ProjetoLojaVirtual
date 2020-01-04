@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ProjetoLojaVirtual.Models
 {
-    public class CodigoRastreamento
+    public class DadosCancelamentoCartao
     {
-        [Display(Name = "Código de rastreamento")]
         [Required(ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E001")]
-        [MinLength(10, ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E002")]
-        public string Codigo { get; set; }
+        public string Motivo { get; set; }
+
+        public string FormPagamento { get; set; }
     }
 }

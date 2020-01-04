@@ -5,6 +5,53 @@
     List<ProdutoItem> produtos = JsonConvert.DeserializeObject<List<ProdutoItem>>(Model.Pedido.DadosProdutos, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() });
     var aniversario = DateTime.Parse(transacao.Customer.Birthday);
 }
+
+@section script {
+
+    @if (ViewBag.MODAL_NFE != null)
+    {
+        <script type="text/javascript">
+            $('#nfe').modal();
+        </script>
+    }
+
+    @if (ViewBag.MODAL_RASTREAMENTO != null)
+    {
+        <script type="text/javascript">
+            $('#rastreamento').modal();
+        </script>
+    }
+
+    @if (ViewBag.MODAL_CARTAOCREDITO != null)
+    {
+        <script type="text/javascript">
+            $('#cancelar-cartao').modal();
+        </script>
+    }
+
+    @if (ViewBag.MODAL_BOLETOBANCARIO != null)
+    {
+        <script type="text/javascript">
+            $('#cancelar-boleto').modal();
+        </script>
+    }
+
+    @if (ViewBag.MODAL_DEVOLVER != null)
+    {
+        <script type="text/javascript">
+            $('#devolver').modal();
+        </script>
+    }
+
+    @if (ViewBag.MODAL_DEVOLVER_REJEITAR != null)
+    {
+        <script type="text/javascript">
+            $('#devolver-rejeitar').modal();
+        </script>
+    }
+
+}
+
 <br /><br />
 <div class="container">
     <div class="row">
@@ -15,7 +62,7 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-md-12">
+        <div class="col-md-12 text-center">
             @if (Model.Pedido.Situacao == PedidoSituacaoConstant.PAGAMENTO_APROVADO)
             {
                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#nfe">
@@ -28,6 +75,8 @@
                     Registrar Cod. Rastreamento
                 </button>
             }
+
+
 
             @if (Model.Pedido.Situacao == PedidoSituacaoConstant.NF_EMITIDA || Model.Pedido.Situacao == PedidoSituacaoConstant.PAGAMENTO_APROVADO)
             {
@@ -44,6 +93,28 @@
                         Cancelar
                     </button>
                 }
+            }
+
+            @if (Model.Pedido.Situacao == PedidoSituacaoConstant.ENTREGUE)
+            {
+                var pedidoSituacao = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.ENTREGUE);
+
+                if (pedidoSituacao != null && DateTime.Now <= pedidoSituacao.Data.AddDays(7))
+                {
+                    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#devolver">
+                        Devolver
+                    </button>
+                }
+            }
+
+            @if (Model.Pedido.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE)
+            {
+                <button type="button" class="btn btn-success">
+                    Aprovar
+                </button>
+                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#devolver-rejeitar">
+                    Rejeitar
+                </button>
             }
         </div>
     </div>
@@ -91,6 +162,23 @@
                     <td><strong>Rastreamento: </strong>@Html.Raw(Model.Pedido.FreteCodRastreamento == null ? "-" : "<a href='https://www.linkcorreios.com.br/" + Model.Pedido.FreteCodRastreamento + "' target='_blank'>" + Model.Pedido.FreteCodRastreamento + "</a>")</td>
                 </tr>
             </table>
+
+            @if (Model.Pedido.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE)
+            {
+                var devolucao = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.DEVOLVER);
+                DadosDevolucao dadosDevolucao = JsonConvert.DeserializeObject<DadosDevolucao>(devolucao.Dados);
+
+                var devolucaoEntrega = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE);
+                var dadosCorreiosDevolucao = JsonConvert.DeserializeObject<Correios.NET.Models.Package>(devolucaoEntrega.Dados);
+                <h3>Devolução</h3>
+                <table class="table table-bordered">
+                    <tr>
+                        <td><strong>Transportadora:</strong> @Model.Pedido.FreteEmpresa</td>
+                        <td><strong>Rastreamento: </strong>@Html.Raw(dadosDevolucao.CodigoRastreamento == null ? "-" : "<a href='https://www.linkcorreios.com.br/" + dadosDevolucao.CodigoRastreamento + "' target='_blank'>" + dadosDevolucao.CodigoRastreamento + "</a>")</td>
+                        <td><strong>Data da devolução (Na loja): </strong>@dadosCorreiosDevolucao.DeliveryDate.ToString()</td>
+                    </tr>
+                </table>
+            }
 
             <h3>Lista de produtos</h3>
             <table class="table table-bordered">
@@ -147,6 +235,7 @@
                     <div class="form-group">
                         <label for="control-nfe">Link da NF-e:</label>
                         <input type="url" class="form-control" id="control-nfe" asp-for="@Model.NFE.NFE_URL" placeholder="URL - NF-e">
+                        <span asp-validation-for="@Model.NFE.NFE_URL" class="text-danger"></span>
                     </div>
 
                 </div>
@@ -175,6 +264,7 @@
                     <div class="form-group">
                         <label for="cod_rastreamento">Código:</label>
                         <input type="text" class="form-control" id="cod_rastreamento" asp-for="@Model.CodigoRastreamento.Codigo" placeholder="Código de rastreamento">
+                        <span asp-validation-for="@Model.CodigoRastreamento.Codigo" class="text-danger"></span>
                     </div>
 
                 </div>
@@ -204,6 +294,7 @@
                     <div class="form-group">
                         <label for="motivo">Motivo:</label>
                         <textarea class="form-control" id="motivo" asp-for="@Model.CartaoCredito.Motivo" placeholder="Motivo do cancelamento"></textarea>
+                        <span asp-validation-for="@Model.CartaoCredito.Motivo" class="text-danger"></span>
                     </div>
 
                 </div>
@@ -223,7 +314,7 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Cancelar pedido (Cartão de crédito)</h5>
+                    <h5 class="modal-title" id="exampleModalLabel">Cancelar pedido (Boleto bancário)</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -275,6 +366,68 @@
                         <span asp-validation-for="@Model.BoletoBancario.CPF" class="text-danger"></span>
                     </div>
 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<!-- Modal -->
+<form method="post" asp-action="RegistrarDevolucaoPedido" asp-route-id="@Model.Pedido.Id">
+    <div class="modal fade" id="devolver" tabindex="-1" role="dialog" aria-labelledby="devolver" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Devolver</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label asp-for="@Model.Devolucao.Motivo"></label>
+                        <textarea class="form-control" id="motivo" asp-for="@Model.Devolucao.Motivo" placeholder="Motivo do cancelamento"></textarea>
+                        <span asp-validation-for="@Model.Devolucao.Motivo" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="@Model.Devolucao.CodigoRastreamento"></label>
+                        <input type="text" class="form-control" asp-for="@Model.Devolucao.CodigoRastreamento" placeholder="Código de rastreamento">
+                        <span asp-validation-for="@Model.Devolucao.CodigoRastreamento" class="text-danger"></span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<!-- Modal -->
+<form method="post" asp-action="RegistrarDevolucaoPedidoRejeicao" asp-route-id="@Model.Pedido.Id">
+    <div class="modal fade" id="devolver-rejeitar" tabindex="-1" role="dialog" aria-labelledby="devolver-rejeitar" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Rejeitar devolução</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+                    <div class="form-group">
+                        <label asp-for="@Model.Devolucao.Motivo"></label>
+                        <textarea class="form-control" id="motivo" asp-for="@Model.Devolucao.Motivo" placeholder="Motivo do cancelamento"></textarea>
+                        <span asp-validation-for="@Model.Devolucao.Motivo" class="text-danger"></span>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
