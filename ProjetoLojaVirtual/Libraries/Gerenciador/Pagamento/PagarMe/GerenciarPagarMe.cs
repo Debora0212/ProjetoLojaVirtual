@@ -261,5 +261,16 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
 
             return PagarMeService.GetDefaultService().Transactions.Find(transactionId);
         }
+
+        public Transaction EstornoCartaoCredito(string TransactionId)
+        {
+            PagarMeService.DefaultApiKey = _configuration.GetValue<String>("Pagamento:PagarMe:ApiKey");
+
+            var transaction = PagarMeService.GetDefaultService().Transactions.Find(TransactionId);
+
+            transaction.Refund();
+
+            return transaction;
+        }
     }
 }
