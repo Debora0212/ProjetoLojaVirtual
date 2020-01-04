@@ -27,6 +27,12 @@ namespace ProjetoLojaVirtual.Libraries.Component
                 PedidoSituacaoConstant.PAGAMENTO_NAO_REALIZADO,
         };
 
+        List<PedidoSituacaoStatus> Timeline3 { get; set; }
+        List<string> StatusTimeLine3 = new List<string>()
+        {
+                PedidoSituacaoConstant.ESTORNO,
+        };
+
 
         public PedidoSituacaoViewComponent()
         {
@@ -42,7 +48,12 @@ namespace ProjetoLojaVirtual.Libraries.Component
             Timeline2.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO, Concluido = false, Cor = "complete" });
             Timeline2.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PAGAMENTO_NAO_REALIZADO, Concluido = false, Cor = "complete-red" });
 
-        }   
+            Timeline3 = new List<PedidoSituacaoStatus>();
+            Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO, Concluido = false, Cor = "complete" });
+            Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PAGAMENTO_APROVADO,Concluido = false, Cor = "complete" });
+            Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.NF_EMITIDA, Concluido = false, Cor = "complete" });
+            Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.ESTORNO, Concluido = false, Cor = "complete-red" });
+        }
 
         public async Task<IViewComponentResult> InvokeAsync(Pedido pedido)
         {
@@ -55,6 +66,16 @@ namespace ProjetoLojaVirtual.Libraries.Component
             if (StatusTimeLine2.Contains(pedido.Situacao))
             {
                 timeline = Timeline2;
+            }
+            if (StatusTimeLine3.Contains(pedido.Situacao))
+            {
+                timeline = Timeline3;
+
+                var nfe = pedido.PedidoSituacoes.Where(a => a.Situacao == PedidoSituacaoConstant.NF_EMITIDA).FirstOrDefault();
+                if(nfe == null)
+                {
+                    timeline.Remove(timeline.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.NF_EMITIDA));
+                }
             }
             if (timeline != null)
             {

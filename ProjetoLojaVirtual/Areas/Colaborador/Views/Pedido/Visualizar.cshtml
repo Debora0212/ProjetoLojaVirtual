@@ -189,7 +189,7 @@
 
 
 <!-- Modal -->
-<form method="post" asp-action="RegistrarRastreamento" asp-route-id="@Model.Pedido.Id">
+<form method="post" asp-action="RegistrarCancelamentoPedidoCartaoCredito" asp-route-id="@Model.Pedido.Id">
     <div class="modal fade" id="cancelar-cartao" tabindex="-1" role="dialog" aria-labelledby="cancelar-cartao" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
@@ -203,7 +203,7 @@
 
                     <div class="form-group">
                         <label for="motivo">Motivo:</label>
-                        <input type="text" class="form-control" id="motivo" asp-for="@Model.CartaoCredito.Motivo" placeholder="Código de rastreamento">
+                        <textarea class="form-control" id="motivo" asp-for="@Model.CartaoCredito.Motivo" placeholder="Motivo do cancelamento"></textarea>
                     </div>
 
                 </div>
@@ -218,7 +218,7 @@
 
 
 <!-- Modal -->
-<form method="post" asp-action="RegistrarRastreamento" asp-route-id="@Model.Pedido.Id">
+<form method="post" asp-action="RegistrarCancelamentoPedidoBoletoBancario" asp-route-id="@Model.Pedido.Id">
     <div class="modal fade" id="cancelar-boleto" tabindex="-1" role="dialog" aria-labelledby="cancelar-boleto" aria-hidden="true">
         <div class="modal-dialog" role="document">
             <div class="modal-content">

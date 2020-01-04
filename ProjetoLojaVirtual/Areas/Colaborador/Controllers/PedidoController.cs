@@ -76,7 +76,6 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             }
             return RedirectToAction(nameof(Visualizar), new { id = id });
         }
-
         public IActionResult RegistrarRastreamento([FromForm]VisualizarViewModel viewModel, int id)
         {
             ModelState.Remove("Pedido");
@@ -105,11 +104,12 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             return RedirectToAction(nameof(Visualizar), new { id = id });
         }
 
+
         public IActionResult RegistrarCancelamentoPedidoCartaoCredito([FromForm]VisualizarViewModel viewModel, int id)
         {
             ModelState.Remove("Pedido");
             ModelState.Remove("NFE");
-            ModelState.Remove("CartaoCredito");
+            ModelState.Remove("CodigoRastreamento");
             ModelState.Remove("BoletoBancario");
 
             if (ModelState.IsValid)
@@ -123,7 +123,6 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 var pedidoSituacao = new PedidoSituacao();
                 pedidoSituacao.Data = DateTime.Now;
-
                 pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.CartaoCredito);
                 pedidoSituacao.PedidoId = id;
                 pedidoSituacao.Situacao = PedidoSituacaoConstant.ESTORNO;
@@ -133,6 +132,39 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 DevolverProdutosEstoque(pedido);
             }
+
+            return RedirectToAction(nameof(Visualizar), new { id = id });
+        }
+
+
+        public IActionResult RegistrarCancelamentoPedidoBoletoBancario([FromForm]VisualizarViewModel viewModel, int id)
+        {
+            ModelState.Remove("Pedido");
+            ModelState.Remove("NFE");
+            ModelState.Remove("CartaoCredito");
+            ModelState.Remove("CodigoRastreamento");
+    
+            if (ModelState.IsValid)
+            {
+                viewModel.BoletoBancario.FormPagamento = MetodoPagamentoConstant.Boleto;
+
+                Pedido pedido = _pedidoRepository.ObterPedido(id);
+                _gerenciarPagarMe.EstornoBoletoBancario(pedido.TransactionId, viewModel.BoletoBancario);
+
+                pedido.Situacao = PedidoSituacaoConstant.ESTORNO;
+
+                var pedidoSituacao = new PedidoSituacao();
+                pedidoSituacao.Data = DateTime.Now;
+                pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.BoletoBancario);
+                pedidoSituacao.PedidoId = id;
+                pedidoSituacao.Situacao = PedidoSituacaoConstant.ESTORNO;
+
+                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                _pedidoRepository.Atualizar(pedido);
+
+                DevolverProdutosEstoque(pedido);
+            }
+
             return RedirectToAction(nameof(Visualizar), new { id = id });
         }
 

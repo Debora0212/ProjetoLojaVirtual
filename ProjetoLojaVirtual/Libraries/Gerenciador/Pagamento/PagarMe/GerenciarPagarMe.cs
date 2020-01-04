@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.Extensions.Configuration;
 using PagarMe;
 using ProjetoLojaVirtual.Libraries.Login;
@@ -15,11 +16,13 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
     {
         private IConfiguration _configuration;
         private LoginCliente _loginCliente;
+        private IMapper _mapper;
 
-        public GerenciarPagarMe(IConfiguration configuration, LoginCliente loginCliente)
+        public GerenciarPagarMe(IConfiguration configuration, LoginCliente loginCliente, IMapper mapper)
         {
             _configuration = configuration;
             _loginCliente = loginCliente;
+            _mapper = mapper;
         }
 
         public Transaction GerarBoleto(decimal valor, List<ProdutoItem> produtos, EnderecoEntrega enderecoEntrega, ValorPrazoFrete valorFrete)
@@ -218,7 +221,6 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             return transaction;
         }
 
-
         public List<Parcelamento> CalcularPagamentoParcelado(decimal valor)
         {
             List<Parcelamento> lista = new List<Parcelamento>();
@@ -269,6 +271,19 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             var transaction = PagarMeService.GetDefaultService().Transactions.Find(TransactionId);
 
             transaction.Refund();
+
+            return transaction;
+        }
+
+        public Transaction EstornoBoletoBancario(string transactionId, DadosCancelamento boletoBancario)
+        {
+            //TODO - Implementar Estorno para Boleto Bancário.
+            PagarMeService.DefaultApiKey = _configuration.GetValue<String>("Pagamento:PagarMe:ApiKey");
+
+            var transaction = PagarMeService.GetDefaultService().Transactions.Find(transactionId);
+            var bankAccount = _mapper.Map<DadosCancelamento, BankAccount>(boletoBancario);
+
+            transaction.Refund(bankAccount);
 
             return transaction;
         }

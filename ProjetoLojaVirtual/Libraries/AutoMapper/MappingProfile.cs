@@ -24,7 +24,7 @@ namespace ProjetoLojaVirtual.Libraries.AutoMapper
 
             CreateMap<Transaction, TransacaoPagarMe>();
 
-            CreateMap <TransacaoPagarMe, Pedido>()
+            CreateMap<TransacaoPagarMe, Pedido>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(orig => 0))
                 .ForMember(dest => dest.ClienteId, opt => opt.MapFrom(orig => int.Parse(orig.Customer.ExternalId)))
                 .ForMember(dest => dest.TransactionId, opt => opt.MapFrom(orig => orig.Id))
@@ -45,6 +45,14 @@ namespace ProjetoLojaVirtual.Libraries.AutoMapper
             CreateMap<TransactionProduto, PedidoSituacao>()
                 .ForMember(dest => dest.Dados, opt => opt.MapFrom(orig => JsonConvert.SerializeObject(orig, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() })));
 
+            CreateMap<DadosCancelamento, BankAccount>()
+             .ForMember(dest => dest.BankCode, opt => opt.MapFrom(orig => orig.BancoCodigo))
+             .ForMember(dest => dest.Agencia, opt => opt.MapFrom(orig => orig.Agencia))
+             .ForMember(dest => dest.AgenciaDv, opt => opt.MapFrom(orig => orig.AgenciaDV))
+             .ForMember(dest => dest.Conta, opt => opt.MapFrom(orig => orig.Conta))
+             .ForMember(dest => dest.ContaDv, opt => opt.MapFrom(orig => orig.ContaDV))
+             .ForMember(dest => dest.LegalName, opt => opt.MapFrom(orig => orig.Nome))
+             .ForMember(dest => dest.DocumentNumber, opt => opt.MapFrom(orig => orig.CPF));
         }
     }
 }
