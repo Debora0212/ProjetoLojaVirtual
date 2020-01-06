@@ -50,6 +50,13 @@
         </script>
     }
 
+    @if (ViewBag.MODAL_DEVOLVERBOLETOBANCARIO != null)
+    {
+        <script type="text/javascript">
+            $('#devolver-aprovar-boleto').modal();
+        </script>
+    }
+
 }
 
 <br /><br />
@@ -109,11 +116,22 @@
 
             @if (Model.Pedido.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE)
             {
-                <button type="button" class="btn btn-success">
-                    Aprovar
-                </button>
+                if (Model.Pedido.FormPagamento == MetodoPagamentoConstant.CartaoCredito)
+                {
+                    <button type="button" class="btn btn-success" asp-action="RegistrarDevolucaoPedidoAprovadoCartaoCredito" asp-route-id="@Model.Pedido.Id">
+                        Aceitar devolução
+                    </button>
+                }
+
+                if (Model.Pedido.FormPagamento == MetodoPagamentoConstant.Boleto)
+                {
+                    <button type="button" class="btn btn-success" data-toggle="modal" data-target="#devolver-aprovar-boleto">
+                        Aceitar devolução
+                    </button>
+                }
+
                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#devolver-rejeitar">
-                    Rejeitar
+                    Rejeitar devolução
                 </button>
             }
         </div>
@@ -162,13 +180,16 @@
                     <td><strong>Rastreamento: </strong>@Html.Raw(Model.Pedido.FreteCodRastreamento == null ? "-" : "<a href='https://www.linkcorreios.com.br/" + Model.Pedido.FreteCodRastreamento + "' target='_blank'>" + Model.Pedido.FreteCodRastreamento + "</a>")</td>
                 </tr>
             </table>
-
-            @if (Model.Pedido.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE)
+            @{
+                var devolucaoEntrega = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE);
+            }
+            @if (devolucaoEntrega != null)
             {
                 var devolucao = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.DEVOLVER);
                 DadosDevolucao dadosDevolucao = JsonConvert.DeserializeObject<DadosDevolucao>(devolucao.Dados);
 
-                var devolucaoEntrega = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE);
+                var devolucaoRejeicaoMotivo = Model.Pedido.PedidoSituacoes.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.DEVOLUCAO_REJEITADA);
+
                 var dadosCorreiosDevolucao = JsonConvert.DeserializeObject<Correios.NET.Models.Package>(devolucaoEntrega.Dados);
                 <h3>Devolução</h3>
                 <table class="table table-bordered">
@@ -177,6 +198,13 @@
                         <td><strong>Rastreamento: </strong>@Html.Raw(dadosDevolucao.CodigoRastreamento == null ? "-" : "<a href='https://www.linkcorreios.com.br/" + dadosDevolucao.CodigoRastreamento + "' target='_blank'>" + dadosDevolucao.CodigoRastreamento + "</a>")</td>
                         <td><strong>Data da devolução (Na loja): </strong>@dadosCorreiosDevolucao.DeliveryDate.ToString()</td>
                     </tr>
+                    @if (devolucaoRejeicaoMotivo != null)
+                    {
+                        <tr>
+                            <td colspan="3"><strong style="color: red;">Motivo da rejeição:</strong> @devolucaoRejeicaoMotivo.Dados</td>
+
+                        </tr>
+                    }
                 </table>
             }
 
@@ -424,10 +452,76 @@
                 <div class="modal-body">
 
                     <div class="form-group">
-                        <label asp-for="@Model.Devolucao.Motivo"></label>
-                        <textarea class="form-control" id="motivo" asp-for="@Model.Devolucao.Motivo" placeholder="Motivo do cancelamento"></textarea>
-                        <span asp-validation-for="@Model.Devolucao.Motivo" class="text-danger"></span>
+                        <label asp-for="@Model.DevolucaoMotivoRejeicao"></label>
+                        <textarea class="form-control" id="motivo" asp-for="@Model.DevolucaoMotivoRejeicao" placeholder="Motivo da rejeição"></textarea>
+                        <span asp-validation-for="@Model.DevolucaoMotivoRejeicao" class="text-danger"></span>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+
+
+
+
+<!-- Modal -->
+<form method="post" asp-action="RegistrarDevolucaoPedidoAprovadoBoletoBancario" asp-route-id="@Model.Pedido.Id">
+    <div class="modal fade" id="devolver-aprovar-boleto" tabindex="-1" role="dialog" aria-labelledby="devolver-aprovar-boleto" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Devolver dinheiro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="cod_banco">Código banco:</label>
+                        <input type="text" class="form-control" id="cod_banco" asp-for="@Model.BoletoBancario.BancoCodigo" placeholder="Código do banco">
+                        <span asp-validation-for="@Model.BoletoBancario.BancoCodigo" class="text-danger"></span>
+                        <a href="http://www.febraban.org.br/associados/utilitarios/Bancos.asp" target="_blank">Consultar</a>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="agencia">Agência:</label>
+                        <input type="text" class="form-control" id="agencia" asp-for="@Model.BoletoBancario.Agencia" placeholder="Nº agência">
+                        -
+                        <input type="text" maxlength="2" class="form-control" id="agencia_dv" asp-for="@Model.BoletoBancario.AgenciaDV" placeholder="">
+
+                        <span asp-validation-for="@Model.BoletoBancario.Agencia" class="text-danger"></span>
+                        <span asp-validation-for="@Model.BoletoBancario.AgenciaDV" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cc">Conta Corrente:</label>
+                        <input type="text" class="form-control" id="cc" asp-for="@Model.BoletoBancario.Conta" placeholder="Conta">
+                        -
+                        <input type="text" class="form-control" id="cc_dv" asp-for="@Model.BoletoBancario.ContaDV" placeholder="">
+
+                        <span asp-validation-for="@Model.BoletoBancario.Conta" class="text-danger"></span>
+                        <span asp-validation-for="@Model.BoletoBancario.ContaDV" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nome">Nome do proprietário da conta:</label>
+                        <input type="text" class="form-control" id="nome" asp-for="@Model.BoletoBancario.Nome" placeholder="Nome">
+                        <span asp-validation-for="@Model.BoletoBancario.Nome" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cpf">CPF do proprietário da conta:</label>
+                        <input type="text" class="form-control" id="cpf" asp-for="@Model.BoletoBancario.CPF" placeholder="CPF">
+                        <span asp-validation-for="@Model.BoletoBancario.CPF" class="text-danger"></span>
+                    </div>
+
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>

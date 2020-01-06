@@ -33,6 +33,22 @@ namespace ProjetoLojaVirtual.Libraries.Component
                 PedidoSituacaoConstant.ESTORNO,
         };
 
+        List<PedidoSituacaoStatus> Timeline4 { get; set; }
+        List<string> StatusTimeLine4 = new List<string>()
+        {
+                PedidoSituacaoConstant.DEVOLVER,
+                PedidoSituacaoConstant.DEVOLVER_ENTREGUE,
+                PedidoSituacaoConstant.DEVOLUCAO_ACEITA,
+                PedidoSituacaoConstant.DEVOLVER_ESTORNO,
+        };
+
+        List<PedidoSituacaoStatus> Timeline5 { get; set; }
+        List<string> StatusTimeLine5 = new List<string>()
+        {
+                PedidoSituacaoConstant.DEVOLUCAO_REJEITADA,
+             
+        };
+
 
         public PedidoSituacaoViewComponent()
         {
@@ -50,9 +66,31 @@ namespace ProjetoLojaVirtual.Libraries.Component
 
             Timeline3 = new List<PedidoSituacaoStatus>();
             Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO, Concluido = false, Cor = "complete" });
-            Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PAGAMENTO_APROVADO,Concluido = false, Cor = "complete" });
+            Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PAGAMENTO_APROVADO, Concluido = false, Cor = "complete" });
             Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.NF_EMITIDA, Concluido = false, Cor = "complete" });
             Timeline3.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.ESTORNO, Concluido = false, Cor = "complete-red" });
+
+            Timeline4 = new List<PedidoSituacaoStatus>();
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PAGAMENTO_APROVADO, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.NF_EMITIDA, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.EM_TRANSPORTE, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.ENTREGUE, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLVER, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLVER_ENTREGUE, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLUCAO_ACEITA, Concluido = false, Cor = "complete" });
+            Timeline4.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLVER_ESTORNO, Concluido = false, Cor = "complete" });
+
+            Timeline5 = new List<PedidoSituacaoStatus>();
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PEDIDO_REALIZADO, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.PAGAMENTO_APROVADO, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.NF_EMITIDA, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.EM_TRANSPORTE, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.ENTREGUE, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLVER, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLVER_ENTREGUE, Concluido = false, Cor = "complete" });
+            Timeline5.Add(new PedidoSituacaoStatus() { Situacao = PedidoSituacaoConstant.DEVOLUCAO_REJEITADA, Concluido = false, Cor = "complete" });
+
         }
 
         public async Task<IViewComponentResult> InvokeAsync(Pedido pedido)
@@ -72,10 +110,18 @@ namespace ProjetoLojaVirtual.Libraries.Component
                 timeline = Timeline3;
 
                 var nfe = pedido.PedidoSituacoes.Where(a => a.Situacao == PedidoSituacaoConstant.NF_EMITIDA).FirstOrDefault();
-                if(nfe == null)
+                if (nfe == null)
                 {
                     timeline.Remove(timeline.FirstOrDefault(a => a.Situacao == PedidoSituacaoConstant.NF_EMITIDA));
                 }
+            }
+            if (StatusTimeLine4.Contains(pedido.Situacao))
+            {
+                timeline = Timeline4;
+            }
+            if (StatusTimeLine5.Contains(pedido.Situacao))
+            {
+                timeline = Timeline5;
             }
             if (timeline != null)
             {
