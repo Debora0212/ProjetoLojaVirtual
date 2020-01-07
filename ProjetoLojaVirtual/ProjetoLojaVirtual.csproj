@@ -56,9 +56,7 @@
 
 
   <ItemGroup>
-    <Reference Include="PagarMeCore">
-      <HintPath>..\..\pagarme-net-master\pagarme-net-master\PagarMeCore\bin\Release\netstandard2.0\PagarMeCore.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\PagarMe\PagarMeCore\PagarMeCore.csproj" />
   </ItemGroup>
 
 

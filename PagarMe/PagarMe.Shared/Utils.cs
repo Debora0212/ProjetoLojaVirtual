@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Text;
-using System.Text.RegularExpressions;
-using Org.BouncyCastle.Crypto.Macs;
+using   Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Crypto.Parameters;
 
 namespace PagarMe
 {
-	public class Utils {
+    public class Utils {
 
 		public static string CalculateRequestHash(HMac mac, string data) {
 			return CalculateRequestHash(mac, Encoding.UTF8.GetBytes(data));
