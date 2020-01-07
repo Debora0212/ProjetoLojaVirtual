@@ -5,7 +5,16 @@ VisualStudioVersion = 15.0.28307.902
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProjetoLojaVirtual", "ProjetoLojaVirtual\ProjetoLojaVirtual.csproj", "{9E766A38-49E6-4F97-804F-CCED59F7B26D}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PagarMe", "PagarMe", "{17D83C73-D905-4605-812C-7FF9CCD2EB61}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PagarMeCore", "PagarMe\PagarMeCore\PagarMeCore.csproj", "{34832975-569D-4370-9E18-058BE1D197BF}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "PagarMe.Shared", "PagarMe\PagarMe.Shared\PagarMe.Shared.shproj", "{A1E35F76-C32B-4490-BB52-282A27E0A37D}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		PagarMe\PagarMe.Shared\PagarMe.Shared.projitems*{a1e35f76-c32b-4490-bb52-282a27e0a37d}*SharedItemsImports = 13
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -15,9 +24,17 @@ Global
 		{9E766A38-49E6-4F97-804F-CCED59F7B26D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E766A38-49E6-4F97-804F-CCED59F7B26D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E766A38-49E6-4F97-804F-CCED59F7B26D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34832975-569D-4370-9E18-058BE1D197BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34832975-569D-4370-9E18-058BE1D197BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34832975-569D-4370-9E18-058BE1D197BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34832975-569D-4370-9E18-058BE1D197BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{34832975-569D-4370-9E18-058BE1D197BF} = {17D83C73-D905-4605-812C-7FF9CCD2EB61}
+		{A1E35F76-C32B-4490-BB52-282A27E0A37D} = {17D83C73-D905-4605-812C-7FF9CCD2EB61}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88C7098E-8F09-4FFD-A2D4-55F30C2BAD5E}

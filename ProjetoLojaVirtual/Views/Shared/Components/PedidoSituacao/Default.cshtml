@@ -1,6 +1,7 @@
 ﻿@model List<PedidoSituacaoStatus>
 @{
     ViewData["Title"] = "Default";
+    var quebraLinha = 0;
 }
 
 @if (Model != null)
@@ -8,6 +9,7 @@
     <ul class="timeline" id="timeline">
         @foreach (var pedidoStatus in Model)
         {
+            quebraLinha++;
             <li class="li @((pedidoStatus.Concluido) ? pedidoStatus.Cor : "")">
                 <div class="timestamp">
                     <span class="date"> @((pedidoStatus.Data != null) ? pedidoStatus.Data.ToString() : "-") <span>
@@ -16,6 +18,13 @@
                     <h4> @pedidoStatus.Situacao </h4>
                 </div>
             </li>
+
+            if(quebraLinha == 5)
+            {
+                @Html.Raw("</ul>");
+                @Html.Raw("<ul class='timeline' id=\"timeline\">");
+                quebraLinha = 0;
+            }
         }
     </ul>
 }

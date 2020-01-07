@@ -66,4 +66,7 @@
     <WCFMetadata Include="Connected Services" />
   </ItemGroup>
 
+
+  <Import Project="..\PagarMe\PagarMe.Shared\PagarMe.Shared.projitems" Label="Shared" />
+
 </Project>
