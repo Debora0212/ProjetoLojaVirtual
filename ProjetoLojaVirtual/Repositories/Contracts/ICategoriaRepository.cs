@@ -12,9 +12,10 @@ namespace ProjetoLojaVirtual.Repositories.Contracts
         //CRUD
         void Cadastrar(Categoria categoria);
         void Atualizar(Categoria categoria);
-        void Excluir(int Id);
-        Categoria ObterCategoria(int Id);
-        Categoria ObterCategoria(string Slug);
+        void Excluir(int id);
+        Categoria ObterCategoria(int id);
+        Categoria ObterCategoria(string slug);
+        Categoria ObterCategoriaPorNome(string nome);
         IEnumerable<Categoria> ObterCategoriasRecursivas(Categoria categoriaPai);
         IEnumerable<Categoria> ObterTodasCategorias();
         IPagedList<Categoria> ObterTodasCategorias(int? pagina);

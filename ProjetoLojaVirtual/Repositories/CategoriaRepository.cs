@@ -87,5 +87,10 @@ namespace ProjetoLojaVirtual.Repositories
         {
             return _banco.Categorias;
         }
+
+        public Categoria ObterCategoriaPorNome(string nome)
+        {
+            return _banco.Categorias.Where(a => a.Nome == nome).FirstOrDefault();
+        }
     }
 }

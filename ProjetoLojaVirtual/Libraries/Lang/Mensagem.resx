@@ -147,6 +147,9 @@
   <data name="MSG_E010" xml:space="preserve">
     <value>Não foi selecionado produtos para compra!</value>
   </data>
+  <data name="MSG_E011" xml:space="preserve">
+    <value>O valor do campo {0} já está sendo utilizado por outro registro!</value>
+  </data>
   <data name="MSG_S001" xml:space="preserve">
     <value>Registro salvo com sucesso!</value>
   </data>

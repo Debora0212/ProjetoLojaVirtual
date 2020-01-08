@@ -45,12 +45,10 @@ function AJAXUploadImagemProduto() {
         var CampoHidden = $(this).parent().find("input[name=imagem]");
         var Imagem = $(this).parent().find(".img-upload");
         var BtnExcluir = $(this).parent().find(".btn-imagem-excluir");
-
-        //Apresenta Imagem Loading.
+       
         Imagem.attr("src", "/img/loading.gif");
         Imagem.addClass("thumb");
-
-        //TODO - Requisição Ajax enviado a Formulario
+      
         $.ajax({
             type: "POST",
             url: "/Colaborador/Imagem/Armazenar",

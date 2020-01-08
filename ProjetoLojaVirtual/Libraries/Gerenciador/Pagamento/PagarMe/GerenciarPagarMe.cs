@@ -125,7 +125,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
             Transaction transaction = new Transaction();
             transaction.PaymentMethod = PaymentMethod.CreditCard;
             /*
-             * TODO - transaction.postbackurl
+             *Não sera feito transaction.postbackurl
              * - Parâmetro importante para que seu site seja informado sobre todas as mudanças de status ocorridas no Pagar.Me.
              * URL 1: https://pagarme.zendesk.com/hc/pt-br/articles/205973476-Quando-o-POSTback-%C3%A9-enviado-
              * URL 2: https://docs.pagar.me/v1/reference#criar-transacao

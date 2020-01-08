@@ -37,8 +37,6 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
         [HttpGet]
         public IActionResult Cadastrar()
         {
-            //TODO - Melhorar o HTML do campo Nome.
-            //TODO - Remover do JS a opção de Carregar o CEP quando ele está no cookie para esta tela.
             return View();
         }
 

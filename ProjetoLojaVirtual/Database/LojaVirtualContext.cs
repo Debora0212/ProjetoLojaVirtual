@@ -17,7 +17,7 @@ namespace ProjetoLojaVirtual.Database
 
         public LojaVirtualContext(DbContextOptions<LojaVirtualContext> options) : base(options)
         {
-
+            ChangeTracker.QueryTrackingBehavior = QueryTrackingBehavior.NoTracking;
         }
 
         public DbSet<Cliente>Clientes { get; set; }

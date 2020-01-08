@@ -372,7 +372,6 @@ function MoverScrollOrdenacao() {
 }
 function MudarOrdenacao() {
     $("#ordenacao").change(function () {
-        //TODO - Redirecionar para a tela Home/Index passando as QueryString de Ordenação e mantendo a Pagina e a pesquisa.
         var Pagina = 1;
         var Pesquisa = "";
         var Ordenacao = $(this).val();
