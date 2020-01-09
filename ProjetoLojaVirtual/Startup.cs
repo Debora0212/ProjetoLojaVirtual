@@ -141,7 +141,8 @@ namespace ProjetoLojaVirtual
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseStatusCodePagesWithReExecute("/Error/{0}");
+                app.UseExceptionHandler("/Error/Error500");
                 app.UseHsts();
             }
 

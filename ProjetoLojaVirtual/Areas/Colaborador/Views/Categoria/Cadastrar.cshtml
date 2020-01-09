@@ -6,7 +6,7 @@
 
 <h1>Cadastrar</h1>
 
-<form method="post">
+<form method="post" id="form-categoria">
     <div class="form-group">
         <label asp-for="Nome"></label>
         <input asp-for="Nome" class="form-control" placeholder="Digite o nome da categoria">
@@ -14,7 +14,7 @@
     </div>
     <div class="form-group">
         <label asp-for="Slug"></label>
-        <input asp-for="Slug" class="form-control" placeholder="Digite o slug da categoria">
+        <input asp-for="Slug" readonly="readonly" class="form-control" placeholder="Digite o slug da categoria">
         <span asp-validation-for="Slug" class="text-danger"></span>
     </div>
     <div class="form-group">

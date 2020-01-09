@@ -5,7 +5,7 @@
 
 <h1>Atualizar</h1>
 
-<form method="post">
+<form method="post" id="form-categoria">
     <input type="hidden" asp-for="Id" />
 
     <div class="form-group">
@@ -15,7 +15,7 @@
     </div>
     <div class="form-group">
         <label asp-for="Slug"></label>
-        <input asp-for="Slug" class="form-control" placeholder="Digite o slug da categoria">
+        <input asp-for="Slug" readonly="readonly" class="form-control" placeholder="Digite o slug da categoria">
         <span asp-validation-for="Slug" class="text-danger"></span>
     </div>
     <div class="form-group">

@@ -9,8 +9,16 @@
     $('.dinheiro').mask('000.000.000.000.000,00', { reverse: true });
 
     AJAXUploadImagemProduto();
+    CategoriaSlug();
 });
 
+function CategoriaSlug() {
+    if ($("#form-categoria").length > 0) {
+        $("input[name=Nome]").keyup(function () {
+            $("input[name=Slug]").val(convertToSlug($(this).val()));
+        });
+    }
+}
 function AJAXUploadImagemProduto() {
     $(".img-upload").click(function () {
         $(this).parent().parent().find(".input-file").click();
@@ -69,4 +77,12 @@ function AJAXUploadImagemProduto() {
             }
         });
     });
+}
+
+function convertToSlug(Text) {
+    return Text
+        .toLowerCase()
+        .replace(/ /g, '-')
+        .replace(/[^\w-]+/g, '')
+        ;
 }

@@ -1,0 +1,20 @@
+﻿
+@{
+    ViewData["Title"] = "ErroGenerico";
+}
+<br />
+<br />
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Error - @ViewBag.StatusCode</h1>
+            <p>
+                @ViewBag.Mensagem
+            </p>
+        </div>
+        <div class="col-4">
+            <img src="~/img/ErrorGenerico.jpg" alt="Imagem de erro" />
+        </div>
+    </div>
+</div>
+
