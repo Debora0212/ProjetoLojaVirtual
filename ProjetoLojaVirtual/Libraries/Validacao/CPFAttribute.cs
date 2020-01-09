@@ -16,6 +16,10 @@ namespace ProjetoLojaVirtual.Libraries.Validacao
 
         public static bool IsCpf(string cpf)
         {
+            if(cpf == null)
+            {
+                return false;
+            }
             int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
             int[] multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
             string tempCpf;

@@ -13,8 +13,6 @@ namespace ProjetoLojaVirtual.Models
     {
         [Display(Name = "Código")]
         public int Id { get; set; }
-
-        //TODO-Criar validacao -Nome categoria unico no banco de dados
         
         [Required(ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E001")]
         [MinLength(4, ErrorMessageResourceType = typeof(Mensagem), ErrorMessageResourceName = "MSG_E002")]

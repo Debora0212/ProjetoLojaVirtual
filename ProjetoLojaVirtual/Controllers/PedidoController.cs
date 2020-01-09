@@ -25,11 +25,13 @@ namespace ProjetoLojaVirtual.Controllers
         public IActionResult Index(int id)
         {
             Pedido pedido = _pedidoRepository.ObterPedido(id);
-
+            if(pedido == null)
+            {
+                return new StatusCodeResult(404);
+            }
             if (pedido.ClienteId != _loginCliente.GetCliente().Id)
             {
-                //TODO - Implementar página HTML bonita para acesso negado/ERRO4XX/ERRO5XX
-                return new ContentResult() { Content = "Acesso negado. Cliente não autorizada para este pedido." };
+                return new StatusCodeResult(403);
             }
 
             ViewBag.Produtos = JsonConvert.DeserializeObject<List<ProdutoItem>>(

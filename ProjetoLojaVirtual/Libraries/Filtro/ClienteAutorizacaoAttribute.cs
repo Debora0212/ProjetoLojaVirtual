@@ -26,7 +26,7 @@ namespace ProjetoLojaVirtual.Libraries.Filtro
             Cliente cliente = _loginCliente.GetCliente();
             if (cliente == null)
             {
-                context.Result = new ContentResult() { Content = "Acesso negado." };
+                context.Result = new StatusCodeResult(403);
             }
             
         }

@@ -29,8 +29,7 @@ namespace ProjetoLojaVirtual.Libraries.Filtro
             {
                 if(colaborador.Tipo == ColaboradorTipoConstant.Comum && _tipoColaboradorAutorizado == ColaboradorTipoConstant.Gerente)
                 {
-                    //TODO - Verificar a  tela de acesso negado e fazer ela ficar bonita
-                    context.Result = new ForbidResult();
+                    context.Result = new StatusCodeResult(403);
                 }
             }
         }

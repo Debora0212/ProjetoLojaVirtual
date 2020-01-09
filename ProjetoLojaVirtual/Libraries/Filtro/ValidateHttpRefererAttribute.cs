@@ -15,8 +15,7 @@ namespace ProjetoLojaVirtual.Libraries.Filtro
             string referer = context.HttpContext.Request.Headers["Referer"].ToString();
             if (string.IsNullOrEmpty(referer))
             {
-                //TODO - Criar uma tela de acesso negado
-                context.Result = new ContentResult() { Content = "Acesso negado!" };
+                context.Result = new StatusCodeResult(403);
             }
             else
             {
@@ -27,8 +26,7 @@ namespace ProjetoLojaVirtual.Libraries.Filtro
                  
                 if(hostReferer != hostServidor)
                 {
-                    //TODO - Criar uma tela de acesso negado
-                    context.Result = new ContentResult() { Content = "Acesso negado!" };
+                    context.Result = new StatusCodeResult(403);
                 }
             }
         }
@@ -37,7 +35,6 @@ namespace ProjetoLojaVirtual.Libraries.Filtro
         {
             //Executado após de passar pelo controlador
         }
-
        
     }
 }
