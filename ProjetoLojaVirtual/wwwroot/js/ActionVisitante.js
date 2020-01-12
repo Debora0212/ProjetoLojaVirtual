@@ -281,9 +281,6 @@ function OrquestradorDeAcoesProduto(operacao, botao) {
      */
     AlteracoesVisuaisProdutoCarrinho(produto, operacao);
 
-    //TODO - Adicionar validações.
-
-    //TODO - Atualizar o subtotal do produto
 }
 function AlteracoesVisuaisProdutoCarrinho(produto, operacao) {
     if (operacao == "aumentar") {

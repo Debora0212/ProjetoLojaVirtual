@@ -220,10 +220,10 @@
                 @foreach (var produto in produtos)
                 {
                     <tr>
-                        <td>@produto.QuantidadeProdutoCarrinho</td>
+                        <td>@produto.UnidadesPedidas</td>
                         <td>@produto.Nome</td>
                         <td>@produto.Valor.ToString("C")</td>
-                        <td>@((produto.Valor * produto.QuantidadeProdutoCarrinho).ToString("C"))</td>
+                        <td>@((produto.Valor * produto.UnidadesPedidas).ToString("C"))</td>
                     </tr>
                 }
 

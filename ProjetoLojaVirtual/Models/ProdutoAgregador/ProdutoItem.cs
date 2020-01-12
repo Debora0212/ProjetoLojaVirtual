@@ -10,7 +10,7 @@ namespace ProjetoLojaVirtual.Models.ProdutoAgregador
         /*
          * Armazena a quantidade de produtos que o usuário pretende comprar deste item.
          */
-        public int QuantidadeProdutoCarrinho { get; set; }
+        public int UnidadesPedidas { get; set; }
 
     }
 }

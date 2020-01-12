@@ -16,12 +16,15 @@ using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using Newtonsoft.Json;
 using ProjetoLojaVirtual.Libraries.Seguranca;
+using Microsoft.Extensions.Logging;
 
 namespace ProjetoLojaVirtual.Controllers
 {
     public class CarrinhoCompraController : BaseController
     {
+        private ILogger _logger;
         public CarrinhoCompraController(
+            ILogger<CarrinhoCompraController> logger,
             LoginCliente loginCliente,
             CookieCarrinhoCompra carrinhoCompra,
             IEnderecoEntregaRepository enderecoEntregaRepository,
@@ -29,7 +32,8 @@ namespace ProjetoLojaVirtual.Controllers
             IMapper mapper,
             WSCorreiosCalcularFrete wscorreios,
             CalcularPacote calcularPacote,
-            CookieFrete cookieValorPrazoFrete)
+            CookieFrete cookieValorPrazoFrete
+             )
             : base(
                   loginCliente,
                   enderecoEntregaRepository,
@@ -39,7 +43,9 @@ namespace ProjetoLojaVirtual.Controllers
                   wscorreios,
                   calcularPacote,
                   cookieValorPrazoFrete)
-        { }
+
+        { _logger = logger; }
+
         public IActionResult Index()
         {
             List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
@@ -59,7 +65,7 @@ namespace ProjetoLojaVirtual.Controllers
             }
             else
             {
-                var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = 1 };
+                var item = new ProdutoItem() { Id = id, UnidadesPedidas = 1 };
                 _cookieCarrinhoCompra.Cadastrar(item);
 
                 return RedirectToAction(nameof(Index));
@@ -72,13 +78,13 @@ namespace ProjetoLojaVirtual.Controllers
             {
                 return BadRequest(new { mensagem = Mensagem.MSG_E007 });
             }
-            else if (quantidade > produto.Quantidade)
+            else if (quantidade > produto.Estoque)
             {
                 return BadRequest(new { mensagem = Mensagem.MSG_E008 });
             }
             else
             {
-                var item = new ProdutoItem() { Id = id, QuantidadeProdutoCarrinho = quantidade };
+                var item = new ProdutoItem() { Id = id, UnidadesPedidas = quantidade };
                 _cookieCarrinhoCompra.Atualizar(item);
                 return Ok(new { mensagem = Mensagem.MSG_S001 });
             }
@@ -142,6 +148,7 @@ namespace ProjetoLojaVirtual.Controllers
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "CarrinhoCompraController > CalcularFrete");
                 return BadRequest(e);
             }
         }

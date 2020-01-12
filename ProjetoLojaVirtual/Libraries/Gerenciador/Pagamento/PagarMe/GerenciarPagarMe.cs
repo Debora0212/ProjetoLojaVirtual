@@ -89,7 +89,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                 {
                     Id = item.Id.ToString(),
                     Title = item.Nome,
-                    Quantity = item.QuantidadeProdutoCarrinho,
+                    Quantity = item.UnidadesPedidas,
                     Tangible = true,
                     UnitPrice = Mascara.ConverterValorPagarMe(item.Valor)
                 };
@@ -202,7 +202,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe
                 {
                     Id = item.Id.ToString(),
                     Title = item.Nome,
-                    Quantity = item.QuantidadeProdutoCarrinho,
+                    Quantity = item.UnidadesPedidas,
                     Tangible = true,
                     UnitPrice = Mascara.ConverterValorPagarMe(item.Valor)
                 };

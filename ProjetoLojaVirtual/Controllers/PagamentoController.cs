@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PagarMe;
 using ProjetoLojaVirtual.Controllers.Base;
@@ -36,8 +37,10 @@ namespace ProjetoLojaVirtual.Controllers
         private IPedidoRepository _pedidoRepository;
         private IPedidoSituacaoRepository _pedidoSituacaoRepository;
         private GerenciarEmail _gerenciarEmail;
+        private ILogger<PagamentoController> _logger;
 
         public PagamentoController(
+            ILogger<PagamentoController> logger,
             GerenciarEmail gerenciarEmail,
             GerenciarPagarMe gerenciarPagarMe,
             LoginCliente loginCliente,
@@ -66,7 +69,8 @@ namespace ProjetoLojaVirtual.Controllers
             _pedidoRepository = pedidoRepository;
             _pedidoSituacaoRepository = pedidoSituacaoRepository;
             _cookie = cookie;     
-            _gerenciarPagarMe = gerenciarPagarMe;          
+            _gerenciarPagarMe = gerenciarPagarMe;    
+            _logger = logger;
         }
 
         [HttpGet]
@@ -101,6 +105,7 @@ namespace ProjetoLojaVirtual.Controllers
                 }
                 catch (PagarMeException e)
                 {
+                    _logger.LogError(e, "PagamentoController > Index ");
                     TempData["MSG_E"] = MontarMensagensDeErro(e);
 
                     return Index();
@@ -130,6 +135,7 @@ namespace ProjetoLojaVirtual.Controllers
             }
             catch (PagarMeException e)
             {
+                _logger.LogError(e, "PagamentoController > BoletoBancario ");
                 TempData["MSG_E"] = MontarMensagensDeErro(e);
                 return RedirectToAction(nameof(Index));
             }
@@ -158,7 +164,7 @@ namespace ProjetoLojaVirtual.Controllers
             foreach (var produto in produtos)
             {
                 Produto produtoDB = _produtoRepository.ObterProduto(produto.Id);
-                produtoDB.Quantidade -= produto.QuantidadeProdutoCarrinho;
+                produtoDB.Estoque -= produto.UnidadesPedidas;
 
                 _produtoRepository.Atualizar(produtoDB);
             }
@@ -230,7 +236,7 @@ namespace ProjetoLojaVirtual.Controllers
 
             foreach (var produto in produtos)
             {
-                total += produto.Valor * produto.QuantidadeProdutoCarrinho;
+                total += produto.Valor * produto.UnidadesPedidas;
             }
 
             return total;

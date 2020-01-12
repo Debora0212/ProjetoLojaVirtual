@@ -1,5 +1,6 @@
 ﻿using Coravel.Invocable;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Models.Constants;
 using ProjetoLojaVirtual.Repositories.Contracts;
@@ -15,15 +16,19 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
         private IPedidoRepository _pedidoRepository;
         private IPedidoSituacaoRepository _pedidoSituacaoRepository;
         private IConfiguration _configuration;
+        private ILogger<PedidoFinalizadoJob> _logger;
 
-        public PedidoFinalizadoJob(IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, IConfiguration configuration)
+        public PedidoFinalizadoJob(ILogger<PedidoFinalizadoJob> logger, IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, IConfiguration configuration)
         {
             _pedidoRepository = pedidoRepository;
             _pedidoSituacaoRepository = pedidoSituacaoRepository;
             _configuration = configuration;
+            _logger = logger;
         }
         public Task Invoke()
         {
+            _logger.LogInformation("> PedidoFinalziadoJob: Iniciando");
+
             var pedidos = _pedidoRepository.ObterTodosPedidosPorSituacao(PedidoSituacaoConstant.ENTREGUE);
             foreach (var pedido in pedidos)
             {
@@ -48,6 +53,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
                     }
                 }
             }
+            _logger.LogInformation("> PedidoFinalizadoJob: Finalizado");
 
             return Task.CompletedTask;
         }

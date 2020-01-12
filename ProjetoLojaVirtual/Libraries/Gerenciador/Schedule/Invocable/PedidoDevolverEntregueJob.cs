@@ -1,4 +1,5 @@
 ﻿using Coravel.Invocable;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Models.Constants;
@@ -14,16 +15,21 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
     {
         private IPedidoRepository _pedidoRepository;
         private IPedidoSituacaoRepository _pedidoSituacaoRepository;
+        private ILogger<PedidoDevolverEntregueJob> _logger;
 
-        public PedidoDevolverEntregueJob(IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository)
+        public PedidoDevolverEntregueJob(ILogger<PedidoDevolverEntregueJob> logger, IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository)
         {
             _pedidoRepository = pedidoRepository;
             _pedidoSituacaoRepository = pedidoSituacaoRepository;
+            _logger = logger;
         }
 
         public Task Invoke()
         {
+            _logger.LogInformation("> PedidoDevolverEntregueJob: Iniciando");
+        
             var pedidos = _pedidoRepository.ObterTodosPedidosPorSituacao(PedidoSituacaoConstant.DEVOLVER);
+
             foreach (var pedido in pedidos)
             {
                 var result = new Correios.NET.Services().GetPackageTracking(pedido.FreteCodRastreamento);
@@ -43,6 +49,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
                 }
 
             }
+            _logger.LogInformation("> PedidoDevolverEntregueJob: Finalizado");
 
             return Task.CompletedTask;
         }

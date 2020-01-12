@@ -24,7 +24,6 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         private GerenciarPagarMe _gerenciarPagarMe;
         private IProdutoRepository _produtoRepository;
 
-        //TODO - Remover ProdutoRepository (Quando refatorar DevolverProdutoEstoque)
         public PedidoController(IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, GerenciarPagarMe gerenciarPagarMe, IProdutoRepository produtoRepository)
         {
             _pedidoRepository = pedidoRepository;
@@ -51,13 +50,8 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
         public IActionResult NFE([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("CodigoRastreamento");
-            ModelState.Remove("CartaoCredito");
-            ModelState.Remove("BoletoBancario");
-            ModelState.Remove("Devolucao");
-            ModelState.Remove("DevolucaoMotivoRejeicao");
-
+            ValidarFormulario(nameof(viewModel.NFE));
+           
             if (ModelState.IsValid)
             {
                 string url = viewModel.NFE.NFE_URL;
@@ -66,13 +60,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
                 pedido.NFE = url;
                 pedido.Situacao = PedidoSituacaoConstant.NF_EMITIDA;
 
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = url;
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.NF_EMITIDA;
-
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, url, PedidoSituacaoConstant.NF_EMITIDA);
 
                 _pedidoRepository.Atualizar(pedido);
 
@@ -83,14 +71,10 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             viewModel.Pedido = _pedidoRepository.ObterPedido(id);
             return View(nameof(Visualizar), viewModel);
         }
+
         public IActionResult RegistrarRastreamento([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("NFE");
-            ModelState.Remove("CartaoCredito");
-            ModelState.Remove("BoletoBancario");
-            ModelState.Remove("Devolucao");
-            ModelState.Remove("DevolucaoMotivoRejeicao");
+            ValidarFormulario(nameof(viewModel.CodigoRastreamento));
 
             if (ModelState.IsValid)
             {
@@ -100,13 +84,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
                 pedido.FreteCodRastreamento = codRastreamento;
                 pedido.Situacao = PedidoSituacaoConstant.EM_TRANSPORTE;
 
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = codRastreamento;
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.EM_TRANSPORTE;
-
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, codRastreamento, PedidoSituacaoConstant.EM_TRANSPORTE);
 
                 _pedidoRepository.Atualizar(pedido);
 
@@ -116,18 +94,11 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             ViewBag.MODAL_RASTREAMENTO = true;
             viewModel.Pedido = _pedidoRepository.ObterPedido(id);
             return View(nameof(Visualizar), viewModel);
-
         }
-
 
         public IActionResult RegistrarCancelamentoPedidoCartaoCredito([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("NFE");
-            ModelState.Remove("CodigoRastreamento");
-            ModelState.Remove("BoletoBancario");
-            ModelState.Remove("Devolucao");
-            ModelState.Remove("DevolucaoMotivoRejeicao");
+            ValidarFormulario(nameof(viewModel.CartaoCredito));
 
             if (ModelState.IsValid)
             {
@@ -138,16 +109,11 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 pedido.Situacao = PedidoSituacaoConstant.ESTORNO;
 
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.CartaoCredito);
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.ESTORNO;
-
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, viewModel.CartaoCredito, PedidoSituacaoConstant.ESTORNO);
+        
                 _pedidoRepository.Atualizar(pedido);
 
-                DevolverProdutosEstoque(pedido);
+                _produtoRepository.DevolverProdutoAoEstoque(pedido);
 
                 return RedirectToAction(nameof(Visualizar), new { id = id });
             }
@@ -157,15 +123,9 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             return View(nameof(Visualizar), viewModel);
         }
 
-
         public IActionResult RegistrarCancelamentoPedidoBoletoBancario([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("NFE");
-            ModelState.Remove("CartaoCredito");
-            ModelState.Remove("CodigoRastreamento");
-            ModelState.Remove("Devolucao");
-            ModelState.Remove("DevolucaoMotivoRejeicao");
+            ValidarFormulario(nameof(viewModel.BoletoBancario));
 
             if (ModelState.IsValid)
             {
@@ -176,16 +136,11 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
                 pedido.Situacao = PedidoSituacaoConstant.ESTORNO;
 
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.BoletoBancario);
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.ESTORNO;
-
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, viewModel.BoletoBancario, PedidoSituacaoConstant.ESTORNO);
+                
                 _pedidoRepository.Atualizar(pedido);
 
-                DevolverProdutosEstoque(pedido);
+                _produtoRepository.DevolverProdutoAoEstoque(pedido);
 
                 return RedirectToAction(nameof(Visualizar), new { id = id });
             }
@@ -197,25 +152,15 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
         public IActionResult RegistrarDevolucaoPedido([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("NFE");
-            ModelState.Remove("CartaoCredito");
-            ModelState.Remove("CodigoRastreamento");
-            ModelState.Remove("BoletoBancario");
-            ModelState.Remove("DevolucaoMotivoRejeicao");
+            ValidarFormulario(nameof(viewModel.Devolucao));
 
             if (ModelState.IsValid)
             {
                 Pedido pedido = _pedidoRepository.ObterPedido(id);
                 pedido.Situacao = PedidoSituacaoConstant.DEVOLVER;
 
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.Devolucao);
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLVER;
-
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, viewModel.Devolucao, PedidoSituacaoConstant.DEVOLVER);
+               
                 _pedidoRepository.Atualizar(pedido);
 
                 return RedirectToAction(nameof(Visualizar), new { id = id });
@@ -228,25 +173,15 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
 
         public IActionResult RegistrarDevolucaoPedidoRejeicao([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("NFE");
-            ModelState.Remove("CartaoCredito");
-            ModelState.Remove("CodigoRastreamento");
-            ModelState.Remove("BoletoBancario");
-            ModelState.Remove("Devolucao");
+            ValidarFormulario(nameof(viewModel.DevolucaoMotivoRejeicao));
 
             if (ModelState.IsValid)
             {
                 Pedido pedido = _pedidoRepository.ObterPedido(id);
                 pedido.Situacao = PedidoSituacaoConstant.DEVOLUCAO_REJEITADA;
 
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = viewModel.DevolucaoMotivoRejeicao;
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLUCAO_REJEITADA;
+                SalvarPedidoSitucao(id, viewModel.DevolucaoMotivoRejeicao, PedidoSituacaoConstant.DEVOLUCAO_REJEITADA);
 
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
                 _pedidoRepository.Atualizar(pedido);
 
                 return RedirectToAction(nameof(Visualizar), new { id = id });
@@ -263,21 +198,13 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             Pedido pedido = _pedidoRepository.ObterPedido(id);
             if (pedido.Situacao == PedidoSituacaoConstant.DEVOLVER_ENTREGUE)
             {
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLUCAO_ACEITA;
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, "", PedidoSituacaoConstant.DEVOLUCAO_ACEITA);
 
                 _gerenciarPagarMe.EstornoCartaoCredito(pedido.TransactionId);
 
-                pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLVER_ESTORNO;
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, "", PedidoSituacaoConstant.DEVOLVER_ESTORNO);
 
-                DevolverProdutosEstoque(pedido);
+                _produtoRepository.DevolverProdutoAoEstoque(pedido);
 
                 pedido.Situacao = PedidoSituacaoConstant.DEVOLVER_ESTORNO;
                 _pedidoRepository.Atualizar(pedido);
@@ -289,42 +216,25 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             return View(nameof(Visualizar), viewModel);
         }
 
-
         public IActionResult RegistrarDevolucaoPedidoAprovadoBoletoBancario([FromForm]VisualizarViewModel viewModel, int id)
         {
-            ModelState.Remove("Pedido");
-            ModelState.Remove("NFE");
-            ModelState.Remove("CartaoCredito");
-            ModelState.Remove("CodigoRastreamento");
-            ModelState.Remove("Devolucao");
-            ModelState.Remove("DevolucaoMotivoRejeicao");
-            ModelState.Remove("BoletoBancario.Motivo");
+            ValidarFormulario(nameof(viewModel.BoletoBancario), "BoletoBancario.Motivo");
 
             Pedido pedido = _pedidoRepository.ObterPedido(id);
             if (ModelState.IsValid)
             {
-
-                var pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLUCAO_ACEITA;
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, "", PedidoSituacaoConstant.DEVOLUCAO_ACEITA);
 
                 viewModel.BoletoBancario.FormPagamento = MetodoPagamentoConstant.Boleto;
 
                 _gerenciarPagarMe.EstornoBoletoBancario(pedido.TransactionId, viewModel.BoletoBancario);
 
-                pedidoSituacao = new PedidoSituacao();
-                pedidoSituacao.Data = DateTime.Now;
-                pedidoSituacao.Dados = JsonConvert.SerializeObject(viewModel.BoletoBancario);
-                pedidoSituacao.PedidoId = id;
-                pedidoSituacao.Situacao = PedidoSituacaoConstant.DEVOLVER_ESTORNO;
-                _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
+                SalvarPedidoSitucao(id, viewModel.BoletoBancario, PedidoSituacaoConstant.DEVOLVER_ESTORNO);
 
                 pedido.Situacao = PedidoSituacaoConstant.DEVOLVER_ESTORNO;
                 _pedidoRepository.Atualizar(pedido);
 
-                DevolverProdutosEstoque(pedido);
+                _produtoRepository.DevolverProdutoAoEstoque(pedido);
 
                 return RedirectToAction(nameof(Visualizar), new { id = id });
             }
@@ -334,21 +244,42 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
             return View(nameof(Visualizar), viewModel);
         }
 
-        //TODO - Refatorar - Centralizar código DevolverProdutosEstoque(PedidoPagamentoSituacao) com PedidoController
-        private void DevolverProdutosEstoque(Pedido pedido)
+
+
+
+        private void ValidarFormulario(string formularioParaValidar, params string [] removerFormularios)
         {
-            List<ProdutoItem> produtos = JsonConvert.DeserializeObject<List<ProdutoItem>>(pedido.DadosProdutos, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() });
+            //ModelState -> Validações.
 
-            //TODO - Renomear - Quantidade Produto (QuantidadeEstoque)
-            //TODO - Renomear - QuantidadeProdutoCarrinho (QuantidadeComprada)
-            foreach (var produto in produtos)
+            //NFE == NFE = Validar.
+            //Pedido == NFE = Não é para validar.
+
+            var propriedades = new VisualizarViewModel().GetType().GetProperties();
+
+            foreach (var propriedade in propriedades)
             {
-                Produto produtoDB = _produtoRepository.ObterProduto(produto.Id);
-                produtoDB.Quantidade += produto.QuantidadeProdutoCarrinho;
-
-                _produtoRepository.Atualizar(produtoDB);
+                //Pedido != NFE = true -> Sai da validação
+                //NFE != NFE = false -> Continua na validação
+                if (propriedade.Name != formularioParaValidar)
+                {
+                    ModelState.Remove(propriedade.Name);
+                }
             }
 
+            foreach (string removerFormulario in removerFormularios)
+            {
+                ModelState.Remove(removerFormulario);
+            }
+        }
+
+        private void SalvarPedidoSitucao(int pedidoId, object dados, string situacao)
+        {
+            var pedidoSituacao = new PedidoSituacao();
+            pedidoSituacao.Data = DateTime.Now;
+            pedidoSituacao.Dados = JsonConvert.SerializeObject(dados);
+            pedidoSituacao.PedidoId = pedidoId;
+            pedidoSituacao.Situacao = situacao;
+            _pedidoSituacaoRepository.Cadastrar(pedidoSituacao);
         }
     }
 }

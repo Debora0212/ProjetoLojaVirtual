@@ -59,12 +59,12 @@
                                         <div class="col-auto">
                                             <div class="input-group mb-2 control-inline">
                                                 <input type="hidden" class="inputProdutoId" value="@item.Id" />
-                                                <input type="hidden" class="inputQuantidadeEstoque" value="@item.Quantidade" />
+                                                <input type="hidden" class="inputQuantidadeEstoque" value="@item.Estoque" />
                                                 <input type="hidden" class="inputValorUnitario" value="@item.Valor" />
                                                 <div class="input-group-prepend">
                                                     <a href="#" class="btn btn-primary diminuir"> - </a>
                                                 </div>
-                                                <input type="text" style="width: 60px; text-align: center" readonly="readonly" class="form-control inputQuantidadeProdutoCarrinho" value="@item.QuantidadeProdutoCarrinho">
+                                                <input type="text" style="width: 60px; text-align: center" readonly="readonly" class="form-control inputQuantidadeProdutoCarrinho" value="@item.UnidadesPedidas">
                                                 <div class="input-group-append">
                                                     <a href="#" class="btn btn-primary aumentar"> + </a>
                                                 </div>
@@ -72,7 +72,7 @@
                                         </div>
                                     </td>
                                     @{
-                                        var ResultadoSubtotalItem = item.Valor * item.QuantidadeProdutoCarrinho;
+                                        var ResultadoSubtotalItem = item.Valor * item.UnidadesPedidas;
                                         Subtotal = Subtotal + ResultadoSubtotalItem;
                                     }
                                     <td>

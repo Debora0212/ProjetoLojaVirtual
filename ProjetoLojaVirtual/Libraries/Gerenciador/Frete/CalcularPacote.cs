@@ -16,7 +16,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Frete
             Pacote pacote = new Pacote();
             foreach (var item in produtos)
             {
-                for (int i = 0; i < item.QuantidadeProdutoCarrinho; i++)
+                for (int i = 0; i < item.UnidadesPedidas; i++)
                 {
                     var peso = pacote.Peso + item.Peso;
                     var comprimento = (pacote.Comprimento > item.Comprimento) ? pacote.Comprimento : item.Comprimento;

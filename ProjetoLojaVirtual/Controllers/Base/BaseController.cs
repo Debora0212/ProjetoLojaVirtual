@@ -47,7 +47,7 @@ namespace ProjetoLojaVirtual.Controllers.Base
                 Produto produto = _produtoRepository.ObterProduto(item.Id);
 
                 ProdutoItem produtoItem = _mapper.Map<ProdutoItem>(produto);
-                produtoItem.QuantidadeProdutoCarrinho = item.QuantidadeProdutoCarrinho;
+                produtoItem.UnidadesPedidas = item.UnidadesPedidas;
 
                 produtoItemCompleto.Add(produtoItem);
             }

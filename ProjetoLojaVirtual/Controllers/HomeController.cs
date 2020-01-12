@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Http;
 using ProjetoLojaVirtual.Libraries.Login;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Models.ViewModels;
+using Microsoft.Extensions.Logging;
 
 namespace ProjetoLojaVirtual.Controllers
 {
@@ -21,12 +22,14 @@ namespace ProjetoLojaVirtual.Controllers
         private INewsletterRepository _repositoryNewsletter;
         private GerenciarEmail _gerenciarEmail;
         private IProdutoRepository _produtoRepository;
+        private ILogger<HomeController> _logger;
 
-        public HomeController(IProdutoRepository produtoRepository, IClienteRepository repositoryCliente, INewsletterRepository repositoryNewsletter, LoginCliente loginCliente, GerenciarEmail gerenciarEmail)
+        public HomeController(ILogger<HomeController> logger, IProdutoRepository produtoRepository, IClienteRepository repositoryCliente, INewsletterRepository repositoryNewsletter, LoginCliente loginCliente, GerenciarEmail gerenciarEmail)
         {
             _repositoryNewsletter = repositoryNewsletter;
             _gerenciarEmail = gerenciarEmail;
             _produtoRepository = produtoRepository;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -97,7 +100,7 @@ namespace ProjetoLojaVirtual.Controllers
             {
                 ViewData["MSG_E"] = "Ops! Tivemos um erro, tente novamente mais tarde!";
 
-                //TODO - Implentar log
+                _logger.LogError(e, "HomeController > ContattoAcao - Expection");
             }
             
             return View("Contato");

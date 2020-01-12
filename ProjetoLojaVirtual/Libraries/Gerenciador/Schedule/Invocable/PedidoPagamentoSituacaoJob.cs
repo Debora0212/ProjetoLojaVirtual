@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Coravel.Invocable;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using PagarMe;
 using ProjetoLojaVirtual.Libraries.Gerenciador.Pagamento.PagarMe;
@@ -25,8 +26,9 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
         private IMapper _mapper;
         private IConfiguration _configuration;
         private IProdutoRepository _produtoRepository;
+        private ILogger<PedidoPagamentoSituacaoJob> _logger;
 
-        public PedidoPagamentoSituacaoJob(GerenciarPagarMe gerenciarPagarMe, IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, IMapper mapper, IConfiguration configuration, IProdutoRepository produtoRepository)
+        public PedidoPagamentoSituacaoJob(ILogger<PedidoPagamentoSituacaoJob> logger, GerenciarPagarMe gerenciarPagarMe, IPedidoRepository pedidoRepository, IPedidoSituacaoRepository pedidoSituacaoRepository, IMapper mapper, IConfiguration configuration, IProdutoRepository produtoRepository)
         {
             _gerenciarPagarMe = gerenciarPagarMe;
             _pedidoRepository = pedidoRepository;
@@ -34,11 +36,14 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
             _pedidoSituacaoRepository = pedidoSituacaoRepository;
             _configuration = configuration;
             _produtoRepository = produtoRepository;
+            _logger = logger;
         }
 
         public Task Invoke()
         {
+            _logger.LogInformation("> PedidoPagamentoSitucaoJob: Iniciando");
             var pedidosRealizados = _pedidoRepository.ObterTodosPedidosPorSituacao(PedidoSituacaoConstant.PEDIDO_REALIZADO);
+
             foreach (var pedido in pedidosRealizados)
             {
                 string situacao = null;
@@ -48,13 +53,13 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
                 if (transaction.Status == TransactionStatus.WaitingPayment && transaction.PaymentMethod == PaymentMethod.Boleto && DateTime.Now > pedido.DataRegistro.AddDays(toleranciaDias))
                 {
                     situacao = PedidoSituacaoConstant.PAGAMENTO_NAO_REALIZADO;
-                    DevolverProdutosEstoque(pedido);
+                    _produtoRepository.DevolverProdutoAoEstoque(pedido);
                 }
 
                 if (transaction.Status == TransactionStatus.Refused)
                 {
                     situacao = PedidoSituacaoConstant.PAGAMENTO_REJEITADO;
-                    DevolverProdutosEstoque(pedido);
+                    _produtoRepository.DevolverProdutoAoEstoque(pedido);
                 }
 
                 if (transaction.Status == TransactionStatus.Authorized || transaction.Status == TransactionStatus.Paid)
@@ -65,7 +70,7 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
                 if (transaction.Status == TransactionStatus.Refunded)
                 {
                     situacao = PedidoSituacaoConstant.ESTORNO;
-                    DevolverProdutosEstoque(pedido);
+                    _produtoRepository.DevolverProdutoAoEstoque(pedido);
                 }
 
                 if (situacao != null)
@@ -86,25 +91,9 @@ namespace ProjetoLojaVirtual.Libraries.Gerenciador.Schedule.Invocable
                 }
             }
 
-            Debug.WriteLine("--PedidoPagamentoSituacaoJob - Executado!--");
-           
+            _logger.LogInformation("> PedidoPagamentoSitucaoJob: Finalizado");
+
             return Task.CompletedTask;
-        }
-
-        private void DevolverProdutosEstoque(Pedido pedido)
-        {
-            List<ProdutoItem> produtos = JsonConvert.DeserializeObject<List<ProdutoItem>>(pedido.DadosProdutos, new JsonSerializerSettings() { ContractResolver = new ProdutoItemResolver<List<ProdutoItem>>() });
-
-            //TODO - Renomear - Quantidade Produto (QuantidadeEstoque)
-            //TODO - Renomear - QuantidadeProdutoCarrinho (QuantidadeComprada)
-            foreach (var produto in produtos)
-            {
-                Produto produtoDB = _produtoRepository.ObterProduto(produto.Id);
-                produtoDB.Quantidade += produto.QuantidadeProdutoCarrinho;
-
-                _produtoRepository.Atualizar(produtoDB);
-            }
-
         }
     }
 }

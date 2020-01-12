@@ -44,6 +44,10 @@ namespace ProjetoLojaVirtual
         public void ConfigureServices(IServiceCollection services)
         {
             /*
+             * API - Logging
+             */
+            services.AddLogging();
+            /*
              * AutoMapper
              */
             services.AddAutoMapper(config=>config.AddProfile<MappingProfile>());
