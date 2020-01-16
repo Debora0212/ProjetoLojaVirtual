@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Index";
     decimal Subtotal = 0;
+    var produtos = (List<ProdutoItem>)ViewBag.Produtos;
 }
 
 <div class="container">
@@ -11,13 +12,13 @@
         <div class="col-md-6">
             <div id="code_itemside_img2">
                 <div class="box items-bordered-wrap">
-                    @foreach (var item in ViewBag.Produtos)
+                    @foreach (var item in produtos)
                     {
                         <figure class="itemside">
                             <div class="aside">
                                 @if (item.Imagens.Count > 0)
                                 {
-                                    <img src="@(((List<Imagem>)item.Imagens).First().Caminho)" class="img-sm">
+                                    <img src="@item.Imagens.First().Caminho" class="img-sm">
                                 }
                                 else
                                 {
@@ -26,13 +27,13 @@
                             </div>
                             <figcaption class="text-wrap align-self-center">
                                 @{
-                                    var ResultadoSubtotalItem = item.Valor * item.QuantidadeProdutoCarrinho;
+                                    var ResultadoSubtotalItem = item.Valor * item.UnidadesPedidas;
                                     Subtotal = Subtotal + ResultadoSubtotalItem;
                                 }
 
                                 <h6 class="title"><strong>@item.Nome.ToUpper()</strong></h6>
                                 <div class="price-wrap">
-                                    <span class="price-new">@item.Valor.ToString("C") x @item.QuantidadeProdutoCarrinho = <strong>@ResultadoSubtotalItem.ToString("C")</strong></span>
+                                    <span class="price-new">@item.Valor.ToString("C") x @item.UnidadesPedidas = <strong>@ResultadoSubtotalItem.ToString("C")</strong></span>
                                 </div>
                             </figcaption>
                         </figure>

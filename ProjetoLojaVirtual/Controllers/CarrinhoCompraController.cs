@@ -50,7 +50,27 @@ namespace ProjetoLojaVirtual.Controllers
         {
             List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
 
-            return View(produtoItemCompleto);
+            foreach(var produto in produtoItemCompleto)
+            {
+                if (produto.Estoque <= 0)
+                {
+                    ViewBag.MSG_E = Mensagem.MSG_E008;
+                    return View("Index", produtoItemCompleto);
+                }
+                    if(produto.Estoque < produto.UnidadesPedidas)
+                    {
+                    ViewBag.MSG_E = Mensagem.MSG_E008;
+                    return View("Index", produtoItemCompleto);
+                }
+            }
+            return View(produtoItemCompleto);          
+        }
+
+        public IActionResult VerificarEstoque()
+        {
+            List<ProdutoItem> produtoItemCompleto = CarregarProdutoDB();
+
+            return RedirectToAction(nameof(EnderecoEntrega));
         }
 
 

@@ -16,7 +16,7 @@
             <div class="alert alert-danger" style="display: none;" role="alert">
 
             </div>
-
+            @{await Html.RenderPartialAsync("~/Views/Shared/_Mensagem.cshtml");}
 
 
             <div id="code_cart">
@@ -79,6 +79,8 @@
                                         <div class="price-wrap">
                                             <var class="price">@(ResultadoSubtotalItem.ToString("C"))</var>
                                             <small class="text-muted">(@item.Valor.ToString("C") cada)</small>
+                                            <br />
+                                            <small class="text-muted"><strong>Estoque:</strong> @item.Estoque</small>
                                         </div>
                                     </td>
                                     <td class="text-right">
@@ -143,11 +145,11 @@
                     <div class="box">
                         @if (_loginCliente.GetCliente() == null)
                         {
-                            <a asp-action="Login" asp-controller="Home" asp-area="Cliente" asp-route-returnUrl="@Url.Action("EnderecoEntrega", "CarrinhoCompra", new { area = "" })" class="btn btn-primary btn-continuar disabled">Continuar</a>
+                            <a asp-action="Login" asp-controller="Home" asp-area="Cliente" asp-route-returnUrl="@Url.Action("VerificarEstoque", "CarrinhoCompra", new { area = "" })" class="btn btn-primary btn-continuar disabled">Continuar</a>
                         }
                         else
                         {
-                            <a asp-action="EnderecoEntrega" asp-controller="CarrinhoCompra" class="btn btn-primary btn-continuar disabled">Continuar</a>
+                            <a asp-action="VerificarEstoque" asp-controller="CarrinhoCompra" class="btn btn-primary btn-continuar disabled">Continuar</a>
                         }
                     </div>
                 </aside>
