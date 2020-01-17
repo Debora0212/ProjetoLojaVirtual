@@ -3,6 +3,7 @@
 @{
     //TODO - Pegar apenas* o primeiro* nome* do usuário e apresentar quando estiver logado.
     var pesquisa = Context.Request.Query["pesquisa"];
+    
 }
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" href="/"> LojaVirtual</a>
@@ -50,7 +51,7 @@
             {
                 <div class="dropdown">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-user-alt"></i> @_loginCliente.GetCliente().Nome
+                        <i class="fas fa-user-alt"></i> @Mascara.PrimeiroNome(_loginCliente.GetCliente().Nome)
                     </button>
                     <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                         <a class="dropdown-item" asp-action="Index" asp-controller="Cliente" asp-area="Cliente" asp-route-id="@_loginCliente.GetCliente().Id">Minha conta</a>

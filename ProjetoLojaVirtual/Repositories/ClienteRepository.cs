@@ -51,6 +51,11 @@ namespace ProjetoLojaVirtual.Repositories
             return _banco.Clientes.Find(Id);
         }
 
+        public Cliente ObterClientePorEmail(string email)
+        {
+            return _banco.Clientes.FirstOrDefault(a=> a.Email == email);
+        }
+
         public IPagedList<Cliente> ObterTodosClientes(int? pagina, string pesquisa)
         {
 

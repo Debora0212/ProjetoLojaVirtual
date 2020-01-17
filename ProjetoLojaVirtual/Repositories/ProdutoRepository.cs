@@ -63,6 +63,11 @@ namespace ProjetoLojaVirtual.Repositories
             return _banco.Produtos.Include(a=>a.Imagens).OrderBy(a=>a.Nome).Where(a=>a.Id == Id).FirstOrDefault();
         }
 
+        public List<Produto> ObterProdutoPorCategoria(int id)
+        {
+            return _banco.Produtos.OrderBy(a => a.Nome).Where(a => a.CategoriaId == id).ToList();
+        }
+
         public IPagedList<Produto> ObterTodosProdutos(int? pagina, string pesquisa)
         {
             return ObterTodosProdutos(pagina, pesquisa, "A", null);

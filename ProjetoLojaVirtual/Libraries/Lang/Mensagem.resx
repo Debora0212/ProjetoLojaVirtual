@@ -150,6 +150,15 @@
   <data name="MSG_E011" xml:space="preserve">
     <value>O valor do campo {0} já está sendo utilizado por outro registro!</value>
   </data>
+  <data name="MSG_E012" xml:space="preserve">
+    <value>Não é possivel excluir Categorias que possuem categoria vinculadas {0}</value>
+  </data>
+  <data name="MSG_E013" xml:space="preserve">
+    <value>Não é possivel excluir Categorias que possuem produtos vinculadas {0}</value>
+  </data>
+  <data name="MSG_E014" xml:space="preserve">
+    <value>E-mail não encontrado na base de dados!</value>
+  </data>
   <data name="MSG_S001" xml:space="preserve">
     <value>Registro salvo com sucesso!</value>
   </data>

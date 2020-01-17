@@ -160,6 +160,33 @@ namespace ProjetoLojaVirtual.Libraries.Lang {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Não é possivel excluir Categorias que possuem categoria vinculadas {0}.
+        /// </summary>
+        public static string MSG_E012 {
+            get {
+                return ResourceManager.GetString("MSG_E012", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Não é possivel excluir Categorias que possuem produtos vinculadas {0}.
+        /// </summary>
+        public static string MSG_E013 {
+            get {
+                return ResourceManager.GetString("MSG_E013", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E-mail não encontrado na base de dados!.
+        /// </summary>
+        public static string MSG_E014 {
+            get {
+                return ResourceManager.GetString("MSG_E014", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Registro salvo com sucesso!.
         /// </summary>
         public static string MSG_S001 {

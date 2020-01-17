@@ -17,6 +17,7 @@ namespace ProjetoLojaVirtual.Repositories.Contracts
 
         void DevolverProdutoAoEstoque(Pedido pedido);
         Produto ObterProduto(int Id);
+        List<Produto> ObterProdutoPorCategoria(int id);
         IPagedList<Produto> ObterTodosProdutos(int? pagina,string pesquisa);
         IPagedList<Produto> ObterTodosProdutos(int? pagina, string pesquisa, string ordenacao, IEnumerable<Categoria> categorias);
         int QuantidadeTotalProdutos();

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,10 +18,12 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
     public class CategoriaController : Controller
     {
         private ICategoriaRepository _categoriaRepository;
+        private IProdutoRepository _produtoRepository;
 
-        public CategoriaController(ICategoriaRepository categoriaRepository)
+        public CategoriaController(ICategoriaRepository categoriaRepository, IProdutoRepository produtoRepository)
         {
             _categoriaRepository = categoriaRepository;
+            _produtoRepository = produtoRepository;
         }
 
         public IActionResult Index(int? pagina)
@@ -32,7 +35,7 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         [HttpGet]
         public IActionResult Cadastrar()
         {
-            ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Select(a =>new SelectListItem(a.Nome, a.Id.ToString()));
+            ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Select(a => new SelectListItem(a.Nome, a.Id.ToString()));
             return View();
         }
 
@@ -56,12 +59,12 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         public IActionResult Atualizar(int id)
         {
             var categoria = _categoriaRepository.ObterCategoria(id);
-            ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Where(a=>a.Id !=id).Select(a => new SelectListItem(a.Nome, a.Id.ToString()));
+            ViewBag.Categorias = _categoriaRepository.ObterTodasCategorias().Where(a => a.Id != id).Select(a => new SelectListItem(a.Nome, a.Id.ToString()));
             return View(categoria);
         }
         [HttpPost]
         public IActionResult Atualizar([FromForm] Categoria categoria, int id)
-       {
+        {
             if (ModelState.IsValid)
             {
                 _categoriaRepository.Atualizar(categoria);
@@ -78,10 +81,39 @@ namespace ProjetoLojaVirtual.Areas.Colaborador.Controllers
         [ValidateHttpReferer]
         public IActionResult Excluir(int id)
         {
+
+
+            var categoriasFilho = _categoriaRepository.ObterCategoriasPorCategoriaPai(id);
+            if (categoriasFilho.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                foreach (var item in categoriasFilho)
+                {
+                    sb.Append($"'{item.Nome}' ");
+                }
+
+                TempData["MSG_E"] = string.Format(Mensagem.MSG_E012, sb.ToString());
+                return RedirectToAction(nameof(Index));
+            }
+
+            var produtosFilho = _produtoRepository.ObterProdutoPorCategoria(id);
+
+            if (produtosFilho.Count > 0)
+            {
+                StringBuilder sb = new StringBuilder();
+
+                foreach (var item in produtosFilho)
+                {
+                    sb.Append($"'{item.Nome}' ");
+                }
+
+                TempData["MSG_E"] = string.Format(Mensagem.MSG_E013, sb.ToString());
+                return RedirectToAction(nameof(Index));
+            }
+
             _categoriaRepository.Excluir(id);
-
             TempData["MSG_S"] = Mensagem.MSG_S002;
-
             return RedirectToAction(nameof(Index));
         }
 

@@ -46,5 +46,10 @@ namespace ProjetoLojaVirtual.Libraries.Texto
 
             return int.Parse(resultadoSeparacao[0]);
         }
+
+        public static string PrimeiroNome(string nomeCompleto)
+        {
+            return nomeCompleto.Split(' ')[0];
+        }
     }
 }
