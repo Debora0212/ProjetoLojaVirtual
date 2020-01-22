@@ -118,8 +118,7 @@ namespace ProjetoLojaVirtual.Libraries.Email
                 usuario.Nome,
                 usuario.Email
             );
-
-
+            
             /*
              * MailMessage -> Construir a mensagem
              */

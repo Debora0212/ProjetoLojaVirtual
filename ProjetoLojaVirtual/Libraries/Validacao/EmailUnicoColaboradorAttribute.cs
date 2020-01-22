@@ -12,14 +12,19 @@ namespace ProjetoLojaVirtual.Libraries.Validacao
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
+            if (value == null)
+            {
+                return new ValidationResult("Digite o e-mail!");
+            }
+
             string Email = (value as string).Trim();
 
-            IColaboradorRepository _colaboradorRepository = (IColaboradorRepository) validationContext.GetService(typeof(IColaboradorRepository));
+            IColaboradorRepository _colaboradorRepository = (IColaboradorRepository)validationContext.GetService(typeof(IColaboradorRepository));
             List<Colaborador> colaboradores = _colaboradorRepository.ObterColaboradorPorEmail(Email);
 
-            Colaborador objColaborador = (Colaborador) validationContext.ObjectInstance;
+            Colaborador objColaborador = (Colaborador)validationContext.ObjectInstance;
 
-            if(colaboradores.Count > 1)
+            if (colaboradores.Count > 1)
             {
                 return new ValidationResult("E-mail já existente!");
             }
@@ -29,7 +34,8 @@ namespace ProjetoLojaVirtual.Libraries.Validacao
                 return new ValidationResult("E-mail já existente!");
             }
             return ValidationResult.Success;
-        }
+
+        }   
 
     }
 }

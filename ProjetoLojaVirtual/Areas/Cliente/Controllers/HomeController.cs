@@ -7,6 +7,7 @@ using ProjetoLojaVirtual.Libraries.Email;
 using ProjetoLojaVirtual.Libraries.Filtro;
 using ProjetoLojaVirtual.Libraries.Lang;
 using ProjetoLojaVirtual.Libraries.Login;
+using ProjetoLojaVirtual.Libraries.Seguranca;
 using ProjetoLojaVirtual.Models;
 using ProjetoLojaVirtual.Repositories.Contracts;
 
@@ -59,6 +60,12 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
             }
         }
 
+        [HttpGet]
+        public IActionResult Recuperar()
+        {
+            return View();
+        }
+
         [HttpPost]
         public IActionResult Recuperar([FromForm]Models.Cliente cliente)
         {
@@ -83,7 +90,7 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
 
                 if (clienteDoBancoDados != null)
                 {
-                   // string idCrip = Base64Cipher.Base64Encode(clienteDoBancoDados.Id.ToString());
+                     string idCrip = Base64Cipher.Base64Encode(clienteDoBancoDados.Id.ToString());
                     _gerenciarEmail.EnviarLinkResetarSenha(clienteDoBancoDados, idCrip);
 
                     TempData["MSG_S"] = Mensagem.MSG_S004;
@@ -95,7 +102,78 @@ namespace ProjetoLojaVirtual.Areas.Cliente.Controllers
                     TempData["MSG_E"] = Mensagem.MSG_E014;
                 }
             }
+            return View();
+        }
 
+
+        [HttpGet]
+        public IActionResult CriarSenha(string id)
+        {
+            try
+            {
+                var idClienteDecrip = Base64Cipher.Base64Decode(id);
+                int idCliente;
+                if ( !int.TryParse(idClienteDecrip, out idCliente))
+                {
+                    TempData["MSG_E"] = Mensagem.MSG_E015;
+                }
+            }
+            catch (System.FormatException e)
+            {
+                TempData["MSG_E"] = Mensagem.MSG_E015;
+            }
+           
+            return View();
+        }
+
+        [HttpPost]
+        public IActionResult CriarSenha([FromForm]Models.Cliente cliente, string id)
+        {
+            ModelState.Remove("Nome");
+            ModelState.Remove("Nascimento");
+            ModelState.Remove("Sexo");
+            ModelState.Remove("CPF");
+            ModelState.Remove("Email");
+            ModelState.Remove("Telefone");
+            ModelState.Remove("CEP");
+            ModelState.Remove("Estado");
+            ModelState.Remove("Cidade");
+            ModelState.Remove("Bairro");
+            ModelState.Remove("Endereco");
+            ModelState.Remove("Complemento");
+            ModelState.Remove("Numero");
+
+            if (ModelState.IsValid)
+            {
+                int idCliente;
+                try
+                {
+                    var idClienteDecrip = Base64Cipher.Base64Decode(id);
+
+                    if (!int.TryParse(idClienteDecrip, out idCliente))
+                    {
+                        TempData["MSG_E"] = Mensagem.MSG_E015;
+                        return View();
+                    }
+
+                }
+                catch (System.FormatException e)
+                {
+                    TempData["MSG_E"] = Mensagem.MSG_E015;
+                    return View();
+                }
+
+
+                var clienteDB = _repositoryCliente.ObterCliente(idCliente);
+                if (clienteDB != null)
+                {
+                    clienteDB.Senha = cliente.Senha;
+
+                    _repositoryCliente.Atualizar(clienteDB);
+                    TempData["MSG_S"] = Mensagem.MSG_S005;
+                }
+
+            }
             return View();
         }
 

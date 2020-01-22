@@ -159,6 +159,9 @@
   <data name="MSG_E014" xml:space="preserve">
     <value>E-mail não encontrado na base de dados!</value>
   </data>
+  <data name="MSG_E015" xml:space="preserve">
+    <value>Link de alteração de senha inválido!</value>
+  </data>
   <data name="MSG_S001" xml:space="preserve">
     <value>Registro salvo com sucesso!</value>
   </data>
@@ -167,5 +170,11 @@
   </data>
   <data name="MSG_S003" xml:space="preserve">
     <value>Senha enviada para o e-mail do colaborador com sucesso!</value>
+  </data>
+  <data name="MSG_S004" xml:space="preserve">
+    <value>E-mail enviado para sua caixa postal!</value>
+  </data>
+  <data name="MSG_S005" xml:space="preserve">
+    <value>Senha alterada com sucesso!</value>
   </data>
 </root>

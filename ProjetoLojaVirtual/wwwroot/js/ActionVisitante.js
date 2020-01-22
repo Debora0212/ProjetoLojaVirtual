@@ -5,6 +5,9 @@
     MudarQuantidadeProdutoCarrinho();
 
     MascaraCEP();
+    MascaraCPF();
+    MascaraNascimento();
+    MascaraTelefone()
     AJAXBuscarCEP();
     AcaoCalcularFreteBTN();
     AJAXCalcularFrete(false);
@@ -157,6 +160,15 @@ function AJAXBuscarCEP() {
 }
 function MascaraCEP() {
     $(".cep").mask("00.000-000");
+}
+function MascaraCPF() {
+    $(".cpf").mask("000.000.000-00");
+}
+function MascaraNascimento() {
+    $(".nascimento").mask("00/00/0000");
+}
+function MascaraTelefone() {
+    $(".telefone").mask('(00) 0000-00009');
 }
 function AcaoCalcularFreteBTN() {
     $(".btn-calcular-frete").click(function (e) {

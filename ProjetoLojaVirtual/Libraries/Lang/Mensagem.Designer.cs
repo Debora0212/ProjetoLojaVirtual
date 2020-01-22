@@ -187,6 +187,15 @@ namespace ProjetoLojaVirtual.Libraries.Lang {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Link de alteração de senha inválido!.
+        /// </summary>
+        public static string MSG_E015 {
+            get {
+                return ResourceManager.GetString("MSG_E015", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Registro salvo com sucesso!.
         /// </summary>
         public static string MSG_S001 {
@@ -210,6 +219,24 @@ namespace ProjetoLojaVirtual.Libraries.Lang {
         public static string MSG_S003 {
             get {
                 return ResourceManager.GetString("MSG_S003", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E-mail enviado para sua caixa postal!.
+        /// </summary>
+        public static string MSG_S004 {
+            get {
+                return ResourceManager.GetString("MSG_S004", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Senha alterada com sucesso!.
+        /// </summary>
+        public static string MSG_S005 {
+            get {
+                return ResourceManager.GetString("MSG_S005", resourceCulture);
             }
         }
     }

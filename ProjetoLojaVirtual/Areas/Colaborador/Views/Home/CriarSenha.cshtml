@@ -1,41 +1,36 @@
 ﻿@model ProjetoLojaVirtual.Models.Colaborador
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Criar nova senha";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <main role="main">
     <br />
     <br />
     <section class="container">
-        <aside class="col-sm-6">
+        <aside class="col-sm-4">
             <h3 class="subtitle-doc">
-                Login do Colaborador
+                Criar nova senha
             </h3>
             <div id="code_login_1">
                 <div class="card">
                     <article class="card-body">
                         @{ await Html.RenderPartialAsync("~/Views/Shared/_Mensagem.cshtml"); }
-                        <h4 class="card-title mb-4 mt-1">Entrar</h4>
+                        <a asp-action="Login" asp-controller="Home" class="float-right btn btn-outline-primary">Login</a>
+                        <h4 class="card-title mb-4 mt-1">Alterar Senha</h4>
                         <form method="post">
                             <div class="form-group">
-                                <label>E-mail</label>
-                                <input asp-for="Email" class="form-control" placeholder="Email" type="email">
-                            </div>
-                            <div class="form-group">
-                                <a class="float-right" asp-action="Recuperar" asp-controller="Home">Esqueceu?</a>
                                 <label>Senha</label>
                                 <input asp-for="Senha" class="form-control" placeholder="******" type="password">
+                                <span asp-validation-for="Senha"></span>
                             </div>
                             <div class="form-group">
-                                <button type="submit" class="btn btn-primary btn-block"> Acessar </button>
+                                <label>Confirmar senha</label>
+                                <input asp-for="ConfirmacaoSenha" class="form-control" placeholder="******" type="password">
+                                <span asp-validation-for="ConfirmacaoSenha"></span>
                             </div>
-                            @{
-                                /*
-                                 * Não esquecer de usar o código abaixo caso esteja usando HTML Helpers:
-                                 * @Html.AntiForgeryToken()
-                                 */
-                            }
-
+                            <div class="form-group">
+                                <button type="submit" class="btn btn-primary btn-block"> Salvar </button>
+                            </div>
                         </form>
                     </article>
                 </div>
